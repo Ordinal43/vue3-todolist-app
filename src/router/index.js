@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import { mdiCalendarToday, mdiCalendarRange } from '@mdi/js'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -8,7 +9,7 @@ const router = createRouter({
       name: 'today',
       component: () => import('@/views/HomeView.vue'),
       meta: {
-        icon: 'mdi-calendar-today',
+        icon: mdiCalendarToday,
         title: 'Today',
       },
     },
@@ -17,7 +18,7 @@ const router = createRouter({
       name: 'upcoming',
       component: () => import('@/views/UpcomingView.vue'),
       meta: {
-        icon: 'mdi-calendar-range',
+        icon: mdiCalendarRange,
         title: 'Upcoming',
       },
     },
