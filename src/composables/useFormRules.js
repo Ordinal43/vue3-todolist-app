@@ -1,4 +1,4 @@
-export default () => {
+export const useFormRules = () => {
   const ruleRequired = (value) => {
     if (value) return true
     return `Field is required.`

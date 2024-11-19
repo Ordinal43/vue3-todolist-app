@@ -71,7 +71,7 @@
 import { computed, nextTick, reactive, ref, useTemplateRef, watch } from 'vue'
 import { useDate } from 'vuetify'
 import { mdiCalendar } from '@mdi/js'
-import useFormRules from '@/composables/useFormRules'
+import { useFormRules } from '@/composables/useFormRules'
 
 const dateAdapter = useDate()
 
