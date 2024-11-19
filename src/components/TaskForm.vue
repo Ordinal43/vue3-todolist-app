@@ -72,6 +72,7 @@ import { computed, nextTick, reactive, ref, useTemplateRef, watch } from 'vue'
 import { useDate } from 'vuetify'
 import { mdiCalendar } from '@mdi/js'
 import { useFormRules } from '@/composables/useFormRules'
+import { useTasksStore } from '@/stores/useTasksStore'
 
 const dateAdapter = useDate()
 
@@ -124,12 +125,17 @@ watch(dialog, async (newValue) => {
     inputTaskNameEl.value.focus()
   }
 })
+
 const isFormValid = ref()
+const tasksStore = useTasksStore()
 const submitForm = () => {
   if (isFormValid.value === true) {
-    console.log(form.taskName.val)
-    console.log(form.taskDesc.val)
-    console.log(form.taskDate.val)
+    tasksStore.addNewTask(
+      form.taskName.val,
+      form.taskDesc.val,
+      form.taskDate.val,
+    )
+    closeDialog()
   }
 }
 </script>
