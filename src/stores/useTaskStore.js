@@ -4,7 +4,7 @@ import { v4 as uuidv4 } from 'uuid'
 
 const LOCAL_STORAGE_KEY = 'todo-list-tasks'
 
-export const useTasksStore = defineStore('task', () => {
+export const useTaskStore = defineStore('task', () => {
   const tasks = useStorage(LOCAL_STORAGE_KEY, new Map())
 
   const setTask = (key, value) => {

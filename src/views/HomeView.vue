@@ -19,17 +19,17 @@
 </template>
 
 <script setup>
-import { useTasksStore } from '@/stores/useTasksStore'
+import { useTaskStore } from '@/stores/useTaskStore'
 import { mdiTrashCan } from '@mdi/js'
 import { computed } from 'vue'
 import { useDate } from 'vuetify/lib/framework.mjs'
 
 const dateAdapter = useDate()
 
-const tasksStore = useTasksStore()
+const taskStore = useTaskStore()
 
 const tasks = computed(() => {
-  return Array.from(tasksStore.tasks).map(([key, value]) => ({
+  return Array.from(taskStore.tasks).map(([key, value]) => ({
     key,
     ...value,
     date: dateAdapter.format(value.date, 'fullDateWithWeekday'),
@@ -37,6 +37,6 @@ const tasks = computed(() => {
 })
 
 const deleteTask = (key) => {
-  tasksStore.deleteTask(key)
+  taskStore.deleteTask(key)
 }
 </script>
