@@ -5,17 +5,16 @@
         <SideMenu />
       </v-navigation-drawer>
 
-      <v-app-bar title="Application bar">
+      <v-app-bar>
         <template v-if="mobile" v-slot:prepend>
           <v-app-bar-nav-icon @click="toggleDrawer"></v-app-bar-nav-icon>
         </template>
       </v-app-bar>
 
-      <v-main
-        class="d-flex align-center justify-center"
-        style="min-height: 300px"
-      >
-        <RouterView />
+      <v-main>
+        <v-container>
+          <RouterView />
+        </v-container>
       </v-main>
     </v-layout>
   </v-app>
