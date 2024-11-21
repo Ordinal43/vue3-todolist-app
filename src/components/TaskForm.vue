@@ -65,12 +65,24 @@
       </v-form>
     </v-card>
   </component>
+
+  <v-snackbar v-model="snackbar">
+    Task added to inbox!
+
+    <template v-slot:actions>
+      <v-btn
+        :icon="mdiClose"
+        variant="text"
+        @click="closeSnackbar"
+      />
+    </template>
+  </v-snackbar>
 </template>
 
 <script setup>
-import { computed, nextTick, reactive, ref, useTemplateRef, watch } from 'vue'
+import { computed, nextTick, ref, useTemplateRef, watch } from 'vue'
 import { useDate } from 'vuetify'
-import { mdiCalendar } from '@mdi/js'
+import { mdiCalendar, mdiClose } from '@mdi/js'
 import { useFormRules } from '@/composables/useFormRules'
 import { useTaskStore } from '@/stores/useTaskStore'
 import { VDialog } from 'vuetify/components/VDialog'
@@ -120,10 +132,10 @@ const getComponentProps = computed(() => {
 // date-picker logic
 const menuDatePicker = ref(false)
 const formattedDate = computed(() =>
-  dateAdapter.format(form.taskDate.val, 'normalDateWithWeekday'),
+  dateAdapter.format(form.value.taskDate.val, 'normalDateWithWeekday'),
 )
 const setTaskDate = (event) => {
-  form.taskDate.val = event
+  form.value.taskDate.val = event
   menuDatePicker.value = false
 }
 
@@ -131,9 +143,11 @@ const setTaskDate = (event) => {
 const { ruleRequired, ruleMaxLen } = useFormRules()
 
 const currentDate = new Date()
+currentDate.setHours(0, 0, 0, 0)
+
 const minDate = ref(currentDate)
 
-const form = reactive({
+const getInitialData = () => ({
   taskName: {
     val: '',
     label: 'Task Name',
@@ -149,11 +163,15 @@ const form = reactive({
   },
 })
 
+const form = ref(getInitialData())
+
 // form logic
 const formEl = useTemplateRef('form-task')
 const inputTaskNameEl = useTemplateRef('input-task-name')
 watch(show, async (newValue) => {
   if (newValue === false) {
+    // reset form and its values
+    form.value = getInitialData()
     formEl.value.reset()
   } else {
     await nextTick()
@@ -165,12 +183,18 @@ const isFormValid = ref()
 const taskStore = useTaskStore()
 const submitForm = () => {
   if (isFormValid.value === true) {
-    taskStore.addNewTask(
-      form.taskName.val,
-      form.taskDesc.val,
-      form.taskDate.val,
-    )
+    const { taskName, taskDesc, taskDate } = form.value
+    taskStore.addNewTask(taskName.val, taskDesc.val, taskDate.val)
     closeForm()
+    if (dateAdapter.isAfterDay(new Date(taskDate.val), new Date())) {
+      snackbar.value = true
+    }
   }
+}
+
+// snackbar logic
+const snackbar = ref(false)
+const closeSnackbar = () => {
+  snackbar.value = false
 }
 </script>

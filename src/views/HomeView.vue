@@ -1,21 +1,15 @@
 <template>
-  <h3>Today's task</h3>
-  <v-list lines="two">
-    <v-list-item v-for="task in tasks" :key="task.key" :title="task.name">
-      <v-card-subtitle>
-        {{ task.date }}
-      </v-card-subtitle>
-      <template #append>
-        <v-btn
-          @click="deleteTask(task.key)"
-          :icon="mdiTrashCan"
-          color="error"
-          density="compact"
-          variant="text"
-        ></v-btn>
-      </template>
-    </v-list-item>
-  </v-list>
+  <div v-show="tasksOverdue.length">
+    <h5>Overdue</h5>
+    <TaskList :tasks="tasksOverdue" />
+  </div>
+  <div v-show="tasksToday.length">
+    <h5>
+      {{ dateAdapter.format(TODAY, 'shortDate') }} - Today -
+      {{ dateAdapter.format(TODAY, 'weekday') }}
+    </h5>
+    <TaskList :tasks="tasksToday" />
+  </div>
   <v-btn
     :prepend-icon="mdiPlusCircle"
     @click="showTaskForm = true"
@@ -29,12 +23,15 @@
 
 <script setup>
 import TaskForm from '@/components/TaskForm.vue'
+import TaskList from '@/components/TaskList.vue'
 import { useTaskStore } from '@/stores/useTaskStore'
-import { mdiPlusCircle, mdiTrashCan } from '@mdi/js'
+import { mdiPlusCircle } from '@mdi/js'
 import { computed, ref } from 'vue'
 import { useDate } from 'vuetify/lib/framework.mjs'
 
 const dateAdapter = useDate()
+const TODAY = new Date()
+TODAY.setHours(0, 0, 0, 0)
 
 // task store logic
 const taskStore = useTaskStore()
@@ -43,13 +40,20 @@ const tasks = computed(() => {
   return Array.from(taskStore.tasks).map(([key, value]) => ({
     key,
     ...value,
-    date: dateAdapter.format(value.date, 'fullDateWithWeekday'),
   }))
 })
 
-const deleteTask = (key) => {
-  taskStore.deleteTask(key)
-}
+const tasksOverdue = computed(() => {
+  return tasks.value.filter((task) => {
+    return dateAdapter.isBefore(new Date(task.date), TODAY)
+  })
+})
+
+const tasksToday = computed(() => {
+  return tasks.value.filter((task) => {
+    return dateAdapter.isSameDay(new Date(task.date), TODAY)
+  })
+})
 
 // TaskForm logic
 const showTaskForm = ref(false)
