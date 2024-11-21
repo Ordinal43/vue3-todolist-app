@@ -24,6 +24,8 @@ export const useTaskStore = defineStore('task', () => {
     setTask(key, newValue)
   }
 
+  const getTask = (key) => tasks.value.get(key)
+
   const deleteTask = (key) => {
     tasks.value.delete(key)
   }
@@ -32,6 +34,7 @@ export const useTaskStore = defineStore('task', () => {
     tasks,
     addNewTask,
     updateTask,
+    getTask,
     deleteTask,
   }
 })
