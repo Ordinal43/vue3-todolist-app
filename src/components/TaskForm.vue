@@ -70,11 +70,7 @@
     Task added to inbox!
 
     <template v-slot:actions>
-      <v-btn
-        :icon="mdiClose"
-        variant="text"
-        @click="closeSnackbar"
-      />
+      <v-btn :icon="mdiClose" variant="text" @click="closeSnackbar" />
     </template>
   </v-snackbar>
 </template>
@@ -89,19 +85,20 @@ import { VDialog } from 'vuetify/components/VDialog'
 
 const dateAdapter = useDate()
 
-// component logic
-const props = defineProps({
-  variant: String,
-})
+// dialog logic
 const show = defineModel()
 const closeForm = () => {
   show.value = false
 }
 
+// component logic
+const { variant } = defineProps({
+  variant: String,
+})
 const VARIANT_DIALOG = 'dialog'
 
 const getComponent = computed(() => {
-  switch (props.variant) {
+  switch (variant) {
     case VARIANT_DIALOG:
       return VDialog
     default:
@@ -109,7 +106,7 @@ const getComponent = computed(() => {
   }
 })
 const getStyle = computed(() => {
-  switch (props.variant) {
+  switch (variant) {
     case VARIANT_DIALOG:
       return null
     default:
@@ -117,7 +114,7 @@ const getStyle = computed(() => {
   }
 })
 const getComponentProps = computed(() => {
-  switch (props.variant) {
+  switch (variant) {
     case VARIANT_DIALOG:
       return {
         modelValue: show.value,
