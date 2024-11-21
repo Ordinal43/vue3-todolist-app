@@ -65,12 +65,24 @@
       </v-form>
     </v-card>
   </component>
+
+  <v-snackbar v-model="snackbar">
+    Task added to inbox!
+
+    <template v-slot:actions>
+      <v-btn
+        :icon="mdiClose"
+        variant="text"
+        @click="closeSnackbar"
+      />
+    </template>
+  </v-snackbar>
 </template>
 
 <script setup>
 import { computed, nextTick, ref, useTemplateRef, watch } from 'vue'
 import { useDate } from 'vuetify'
-import { mdiCalendar } from '@mdi/js'
+import { mdiCalendar, mdiClose } from '@mdi/js'
 import { useFormRules } from '@/composables/useFormRules'
 import { useTaskStore } from '@/stores/useTaskStore'
 import { VDialog } from 'vuetify/components/VDialog'
@@ -174,6 +186,15 @@ const submitForm = () => {
     const { taskName, taskDesc, taskDate } = form.value
     taskStore.addNewTask(taskName.val, taskDesc.val, taskDate.val)
     closeForm()
+    if (dateAdapter.isAfterDay(new Date(taskDate.val), new Date())) {
+      snackbar.value = true
+    }
   }
+}
+
+// snackbar logic
+const snackbar = ref(false)
+const closeSnackbar = () => {
+  snackbar.value = false
 }
 </script>
