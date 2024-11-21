@@ -2,6 +2,8 @@
 
 A simple To-do List App made using Vue 3 with Vite.
 
+Check it out [--> HERE <---](https://ordinal43.github.io/vue3-todolist-app/)
+
 ## Recommended IDE Setup
 
 [VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
