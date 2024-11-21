@@ -131,6 +131,8 @@ const setTaskDate = (event) => {
 const { ruleRequired, ruleMaxLen } = useFormRules()
 
 const currentDate = new Date()
+currentDate.setHours(0, 0, 0, 0)
+
 const minDate = ref(currentDate)
 
 const form = reactive({
