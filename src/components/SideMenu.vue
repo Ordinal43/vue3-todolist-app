@@ -22,7 +22,7 @@
     </v-list-item>
   </v-list>
 
-  <TaskForm is-dialog v-model="showTaskForm" />
+  <TaskForm v-model="showTaskForm" variant="dialog" />
 </template>
 <script setup>
 import { computed, ref } from 'vue'
