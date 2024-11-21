@@ -1,18 +1,19 @@
 <template>
-  <v-list>
+  <v-list nav>
     <v-list-item color="red" @click="openTaskForm">
       <template #prepend>
         <v-icon :icon="mdiPlusCircle"></v-icon>
       </template>
       <v-list-item-title>Add task</v-list-item-title>
     </v-list-item>
+  </v-list>
+  <v-divider />
+  <v-list nav density="compact">
     <v-list-item
       link
       v-for="(item, i) in routes"
       :key="`route-${i}`"
-      :value="item"
       :to="item.path"
-      variant="plain"
     >
       <template #prepend>
         <v-icon :icon="item.icon"></v-icon>
