@@ -1,23 +1,29 @@
 <template>
-  <div v-show="tasksOverdue.length">
-    <h5>Overdue</h5>
-    <TaskList :tasks="tasksOverdue" />
-  </div>
-  <div v-show="tasksToday.length">
-    <h5>
-      {{ dateAdapter.format(TODAY, 'shortDate') }} - Today -
-      {{ dateAdapter.format(TODAY, 'weekday') }}
-    </h5>
-    <TaskList :tasks="tasksToday" />
-  </div>
-  <v-btn
-    :prepend-icon="mdiPlusCircle"
-    @click="openTaskForm"
-    color="primary"
-    variant="text"
-  >
-    Add task
-  </v-btn>
+  <v-row>
+    <v-col cols="12" v-show="tasksOverdue.length">
+      <TaskList :tasks="tasksOverdue">
+        <template #header> Overdue </template>
+      </TaskList>
+    </v-col>
+    <v-col cols="12" v-show="tasksToday.length">
+      <TaskList :tasks="tasksToday">
+        <template #header>
+          {{ dateAdapter.format(TODAY, 'shortDate') }} - Today -
+          {{ dateAdapter.format(TODAY, 'weekday') }}
+        </template>
+        <template #footer>
+          <v-btn
+            :prepend-icon="mdiPlusCircle"
+            :disabled="showTaskForm"
+            @click="openTaskForm"
+            color="primary"
+          >
+            Add task
+          </v-btn>
+        </template>
+      </TaskList>
+    </v-col>
+  </v-row>
   <TaskForm v-model="showTaskForm" />
 </template>
 

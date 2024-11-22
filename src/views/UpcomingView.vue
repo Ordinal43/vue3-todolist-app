@@ -1,16 +1,21 @@
 <template>
-  <div v-show="tasksUpcoming.length">
-    <h5>Upcoming</h5>
-    <TaskList :tasks="tasksUpcoming" />
-  </div>
-  <v-btn
-    :prepend-icon="mdiPlusCircle"
-    @click="openTaskForm"
-    color="primary"
-    variant="text"
-  >
-    Add task
-  </v-btn>
+  <v-row>
+    <v-col cols="12" v-show="tasksUpcoming.length">
+      <TaskList :tasks="tasksUpcoming">
+        <template #header> Upcoming </template>
+        <template #footer>
+          <v-btn
+            :prepend-icon="mdiPlusCircle"
+            :disabled="showTaskForm"
+            @click="openTaskForm"
+            color="primary"
+          >
+            Add task
+          </v-btn>
+        </template>
+      </TaskList>
+    </v-col>
+  </v-row>
   <TaskForm v-model="showTaskForm" />
 </template>
 

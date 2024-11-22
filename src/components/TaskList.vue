@@ -1,5 +1,11 @@
 <template>
   <v-card>
+    <v-list v-if="$slots.header">
+      <v-list-item>
+        <slot name="header" />
+      </v-list-item>
+    </v-list>
+    <v-divider></v-divider>
     <v-list lines="three">
       <v-list-item
         v-for="task in tasks"
@@ -7,9 +13,9 @@
         :title="task.name"
         @click="openTaskDetail(task.key)"
       >
-        <v-card-subtitle>
-          {{ dateAdapter.format(task.date, 'fullDateWithWeekday') }}
-        </v-card-subtitle>
+        <v-list-item-subtitle :class="getDueDateColor(task.date)">
+          {{ dateAdapter.format(task.date, 'shortDate') }}
+        </v-list-item-subtitle>
         <template #append>
           <v-btn
             @click="deleteTask(task.key)"
@@ -19,6 +25,9 @@
             variant="text"
           ></v-btn>
         </template>
+      </v-list-item>
+      <v-list-item v-if="$slots.footer">
+        <slot name="footer" />
       </v-list-item>
     </v-list>
   </v-card>
@@ -42,6 +51,14 @@ defineProps({
     default: () => [],
   },
 })
+
+// tasks logic
+const TODAY = new Date()
+TODAY.setHours(0, 0, 0, 0)
+
+const getOverdue = (date) => dateAdapter.isBefore(new Date(date), TODAY)
+const getDueDateColor = (date) =>
+  getOverdue(date) ? { 'text-red': true } : null
 
 const deleteTask = (key) => {
   taskStore.deleteTask(key)
