@@ -12,7 +12,7 @@
   </div>
   <v-btn
     :prepend-icon="mdiPlusCircle"
-    @click="showTaskForm = true"
+    @click="openTaskForm"
     color="primary"
     variant="text"
   >
@@ -57,4 +57,7 @@ const tasksToday = computed(() => {
 
 // TaskForm logic
 const showTaskForm = ref(false)
+const openTaskForm = () => {
+  showTaskForm.value = true
+}
 </script>
