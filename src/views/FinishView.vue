@@ -1,7 +1,7 @@
 <template>
   <v-row>
     <v-col cols="12" v-show="getTasksCompleted.length === 0">
-      <NoTask />
+      <NoTask>No finished tasks yet...</NoTask>
     </v-col>
     <v-col cols="12" v-show="getTasksCompleted.length">
       <TaskList :tasks="getTasksCompleted">

@@ -4,7 +4,7 @@
       cols="12"
       v-show="getTasksToday.length + getTasksOverdue.length === 0"
     >
-      <NoTask />
+      <NoTask>You have no overdue tasks!</NoTask>
     </v-col>
     <v-col cols="12" v-show="getTasksOverdue.length">
       <TaskList :tasks="getTasksOverdue">

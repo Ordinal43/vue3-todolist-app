@@ -20,6 +20,11 @@
       </template>
 
       <v-list-item-title>{{ item.title }}</v-list-item-title>
+      <template #append>
+        <v-chip variant="outlined" size="x-small">
+          {{ getAmount(i) }}
+        </v-chip>
+        </template>
     </v-list-item>
   </v-list>
 
@@ -29,6 +34,7 @@
 import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { mdiPlusCircle } from '@mdi/js'
+import { useTaskStore } from '@/stores/useTaskStore'
 import TaskForm from './TaskForm.vue'
 
 const routes = computed(() => {
@@ -45,5 +51,26 @@ const routes = computed(() => {
 const showTaskForm = ref(false)
 const openTaskForm = () => {
   showTaskForm.value = true
+}
+
+// sidemenu logic
+const store = useTaskStore()
+
+const amountTasksTodayAndOverdue = computed(() => {
+  return store.getTasksOverdue().length + store.getTasksToday().length
+})
+const amountTasksUpcoming = computed(() => {
+  return store.getTasksUpcoming().length
+})
+const amountTasksCompleted = computed(() => {
+  return store.getTasksCompleted().length
+})
+
+const getAmount = (i) => {
+  switch(i) {
+    case 0: return amountTasksTodayAndOverdue
+    case 1: return amountTasksUpcoming
+    case 2: return amountTasksCompleted
+  }
 }
 </script>

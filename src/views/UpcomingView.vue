@@ -1,7 +1,7 @@
 <template>
   <v-row>
     <v-col cols="12" v-show="getTasksUpcoming.length === 0">
-      <NoTask />
+      <NoTask>You have no upcoming tasks!</NoTask>
     </v-col>
     <v-col cols="12" v-show="getTasksUpcoming.length">
       <TaskList :tasks="getTasksUpcoming">
