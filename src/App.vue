@@ -9,10 +9,11 @@
         <template v-if="mobile" v-slot:prepend>
           <v-app-bar-nav-icon @click="toggleDrawer"></v-app-bar-nav-icon>
         </template>
+        <v-app-bar-title>{{ route.meta.title }}</v-app-bar-title>
       </v-app-bar>
 
       <v-main>
-        <v-container>
+        <v-container max-width="700">
           <RouterView />
         </v-container>
       </v-main>
@@ -22,7 +23,7 @@
 
 <script setup>
 import { ref, watchEffect } from 'vue'
-import { RouterView } from 'vue-router'
+import { RouterView, useRoute } from 'vue-router'
 import SideMenu from '@/components/SideMenu.vue'
 import { useDisplay } from 'vuetify'
 
@@ -38,4 +39,7 @@ watchEffect(() => {
     showDrawer.value = true
   }
 })
+
+// nav bar logic
+const route = useRoute()
 </script>
