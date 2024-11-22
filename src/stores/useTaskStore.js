@@ -9,12 +9,12 @@ export const useTaskStore = defineStore('task', () => {
   // task CRUD logic
   const tasks = useStorage(LOCAL_STORAGE_KEY, new Map())
 
-  const setTask = (key, value) => {
+  const addTaskToMap = (key, value) => {
     tasks.value.set(key, value)
   }
 
   const addNewTask = (taskName, taskDesc, taskDate) => {
-    setTask(uuidv4(), {
+    addTaskToMap(uuidv4(), {
       name: taskName,
       desc: taskDesc,
       date: taskDate,
@@ -23,7 +23,7 @@ export const useTaskStore = defineStore('task', () => {
   }
 
   const updateTask = (key, newValue) => {
-    setTask(key, newValue)
+    addTaskToMap(key, newValue)
   }
 
   const getTask = (key) => tasks.value.get(key)
