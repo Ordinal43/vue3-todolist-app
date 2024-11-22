@@ -1,9 +1,5 @@
 <template>
-  <v-img
-    :width="500"
-    cover
-    :src="imgUrl"
-  ></v-img>
+  <v-img :width="500" cover :src="imgUrl"></v-img>
 
   <h3 class="mt-5">You have no remaining tasks!</h3>
 </template>

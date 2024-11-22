@@ -2,6 +2,7 @@ import { defineStore } from 'pinia'
 import { useStorage } from '@vueuse/core'
 import { v4 as uuidv4 } from 'uuid'
 import { ref } from 'vue'
+import { useDate } from 'vuetify/lib/framework.mjs'
 
 const LOCAL_STORAGE_KEY = 'todo-list-tasks'
 
@@ -14,7 +15,7 @@ export const useTaskStore = defineStore('task', () => {
       name: taskName,
       desc: taskDesc,
       date: taskDate,
-      isComplete: false,
+      isCompleted: false,
     })
   }
 
@@ -22,8 +23,47 @@ export const useTaskStore = defineStore('task', () => {
     tasks.value.delete(key)
   }
 
-  const setTaskComplete = (key, isComplete) => {
-    tasks.value.get(key).isComplete = isComplete
+  const setTaskComplete = (key, isCompleted) => {
+    tasks.value.get(key).isCompleted = isCompleted
+  }
+
+  // getters
+  const dateAdapter = useDate()
+  const TODAY = new Date()
+  TODAY.setHours(0, 0, 0, 0)
+
+  const getTasksArray = () => {
+    return Array.from(tasks.value).map(([key, value]) => ({
+      key,
+      ...value,
+    }))
+  }
+
+  const getTasksToday = () => {
+    return getTasksArray().filter((task) => {
+      return (
+        dateAdapter.isSameDay(new Date(task.date), TODAY) && !task.isCompleted
+      )
+    })
+  }
+  const getTasksOverdue = () => {
+    return getTasksArray().filter((task) => {
+      return (
+        dateAdapter.isBefore(new Date(task.date), TODAY) && !task.isCompleted
+      )
+    })
+  }
+  const getTasksUpcoming = () => {
+    return getTasksArray().filter((task) => {
+      return (
+        dateAdapter.isAfterDay(new Date(task.date), TODAY) && !task.isCompleted
+      )
+    })
+  }
+  const getTasksCompleted = () => {
+    return getTasksArray().filter((task) => {
+      return task.isCompleted
+    })
   }
 
   // active task logic
@@ -38,6 +78,10 @@ export const useTaskStore = defineStore('task', () => {
     addNewTask,
     deleteTask,
     setTaskComplete,
+    getTasksToday,
+    getTasksOverdue,
+    getTasksUpcoming,
+    getTasksCompleted,
     activeKey,
     setActiveKey,
   }
