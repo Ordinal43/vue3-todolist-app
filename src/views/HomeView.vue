@@ -1,5 +1,8 @@
 <template>
   <v-row>
+    <v-col cols="12" v-show="tasksToday.length + tasksOverdue.length === 0">
+      <NoTask />
+    </v-col>
     <v-col cols="12" v-show="tasksOverdue.length">
       <TaskList :tasks="tasksOverdue">
         <template #header> Overdue </template>
@@ -28,6 +31,7 @@
 </template>
 
 <script setup>
+import NoTask from '@/components/NoTask.vue'
 import TaskForm from '@/components/TaskForm.vue'
 import TaskList from '@/components/TaskList.vue'
 import { useTaskStore } from '@/stores/useTaskStore'
@@ -51,13 +55,13 @@ const tasks = computed(() => {
 
 const tasksOverdue = computed(() => {
   return tasks.value.filter((task) => {
-    return dateAdapter.isBefore(new Date(task.date), TODAY)
+    return dateAdapter.isBefore(new Date(task.date), TODAY) && !task.isComplete
   })
 })
 
 const tasksToday = computed(() => {
   return tasks.value.filter((task) => {
-    return dateAdapter.isSameDay(new Date(task.date), TODAY)
+    return dateAdapter.isSameDay(new Date(task.date), TODAY) && !task.isComplete
   })
 })
 

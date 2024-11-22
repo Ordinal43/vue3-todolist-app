@@ -1,5 +1,8 @@
 <template>
   <v-row>
+    <v-col cols="12" v-show="tasksUpcoming.length === 0">
+      <NoTask />
+    </v-col>
     <v-col cols="12" v-show="tasksUpcoming.length">
       <TaskList :tasks="tasksUpcoming">
         <template #header> Upcoming </template>
@@ -20,6 +23,7 @@
 </template>
 
 <script setup>
+import NoTask from '@/components/NoTask.vue'
 import TaskForm from '@/components/TaskForm.vue'
 import TaskList from '@/components/TaskList.vue'
 import { useTaskStore } from '@/stores/useTaskStore'
@@ -43,7 +47,9 @@ const tasks = computed(() => {
 
 const tasksUpcoming = computed(() => {
   return tasks.value.filter((task) => {
-    return dateAdapter.isAfterDay(new Date(task.date), TODAY)
+    return (
+      dateAdapter.isAfterDay(new Date(task.date), TODAY) && !task.isComplete
+    )
   })
 })
 

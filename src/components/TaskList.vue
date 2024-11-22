@@ -1,22 +1,36 @@
 <template>
   <v-card>
-    <v-list v-if="$slots.header">
-      <v-list-item>
-        <slot name="header" />
-      </v-list-item>
-    </v-list>
+    <v-card-title v-if="$slots.header">
+      <slot name="header" />
+    </v-card-title>
     <v-divider></v-divider>
-    <v-list lines="three">
-      <v-list-item
+    <v-container>
+      <v-row
         v-for="task in tasks"
         :key="task.key"
-        :title="task.name"
-        @click="openTaskDetail(task.key)"
+        class="align-center"
+        no-gutters
+        cols="12"
       >
-        <v-list-item-subtitle :class="getDueDateColor(task.date)">
-          {{ dateAdapter.format(task.date, 'shortDate') }}
-        </v-list-item-subtitle>
-        <template #append>
+        <v-col cols="1">
+          <v-checkbox
+            :model-value="task.isComplete"
+            @update:model-value="(value) => completeTask(task.key, value)"
+            color="red"
+            hide-details
+          ></v-checkbox>
+        </v-col>
+        <v-col>
+          <v-card @click="openTaskDetail(task.key)" class="pa-2" variant="text">
+            <h3 :class="getTaskStyle(task.isComplete)">
+              {{ task.name }}
+            </h3>
+            <p :class="getDueDateColor(task.date)">
+              {{ dateAdapter.format(task.date, 'shortDate') }}
+            </p>
+          </v-card>
+        </v-col>
+        <v-col cols="1">
           <v-btn
             @click="deleteTask(task.key)"
             :icon="mdiTrashCan"
@@ -24,12 +38,12 @@
             density="compact"
             variant="text"
           ></v-btn>
-        </template>
-      </v-list-item>
-      <v-list-item v-if="$slots.footer">
-        <slot name="footer" />
-      </v-list-item>
-    </v-list>
+        </v-col>
+      </v-row>
+    </v-container>
+    <v-card-actions v-if="$slots.footer">
+      <slot name="footer" />
+    </v-card-actions>
   </v-card>
 
   <TaskDetail v-model="showTaskDetail" />
@@ -39,8 +53,8 @@
 import { mdiTrashCan } from '@mdi/js'
 import { useTaskStore } from '@/stores/useTaskStore'
 import { useDate } from 'vuetify/lib/framework.mjs'
-import TaskDetail from './TaskDetail.vue'
 import { ref } from 'vue'
+import TaskDetail from './TaskDetail.vue'
 
 const dateAdapter = useDate()
 const taskStore = useTaskStore()
@@ -57,8 +71,16 @@ const TODAY = new Date()
 TODAY.setHours(0, 0, 0, 0)
 
 const getOverdue = (date) => dateAdapter.isBefore(new Date(date), TODAY)
-const getDueDateColor = (date) =>
-  getOverdue(date) ? { 'text-red': true } : null
+const getDueDateColor = (date) => {
+  return getOverdue(date) ? { 'text-red': true } : null
+}
+const getTaskStyle = (isComplete) => {
+  return isComplete ? { 'text-decoration-line-through': true } : null
+}
+
+const completeTask = (key, value) => {
+  taskStore.setTaskComplete(key, value)
+}
 
 const deleteTask = (key) => {
   taskStore.deleteTask(key)
