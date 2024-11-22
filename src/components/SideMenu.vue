@@ -24,7 +24,7 @@
         <v-chip variant="outlined" size="x-small">
           {{ getAmount(i) }}
         </v-chip>
-        </template>
+      </template>
     </v-list-item>
   </v-list>
 
@@ -67,10 +67,13 @@ const amountTasksCompleted = computed(() => {
 })
 
 const getAmount = (i) => {
-  switch(i) {
-    case 0: return amountTasksTodayAndOverdue
-    case 1: return amountTasksUpcoming
-    case 2: return amountTasksCompleted
+  switch (i) {
+    case 0:
+      return amountTasksTodayAndOverdue
+    case 1:
+      return amountTasksUpcoming
+    case 2:
+      return amountTasksCompleted
   }
 }
 </script>

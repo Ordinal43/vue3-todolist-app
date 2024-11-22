@@ -67,7 +67,7 @@
   </component>
 
   <v-snackbar v-model="snackbar">
-    Task added to inbox!
+    Task added!
 
     <template v-slot:actions>
       <v-btn :icon="mdiClose" variant="text" @click="closeSnackbar" />
@@ -183,9 +183,7 @@ const submitForm = () => {
     const { taskName, taskDesc, taskDate } = form.value
     taskStore.addNewTask(taskName.val, taskDesc.val, taskDate.val)
     closeForm()
-    if (dateAdapter.isAfterDay(new Date(taskDate.val), new Date())) {
-      snackbar.value = true
-    }
+    snackbar.value = true
   }
 }
 

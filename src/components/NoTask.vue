@@ -7,5 +7,5 @@
 </template>
 
 <script setup>
-import imgUrl from '/public/no_task.svg'
+import imgUrl from '@/assets/no_task.svg'
 </script>
