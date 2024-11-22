@@ -1,10 +1,10 @@
 <template>
   <v-row>
-    <v-col cols="12" v-show="tasksUpcoming.length === 0">
-      <NoTask />
+    <v-col cols="12" v-show="getTasksUpcoming.length === 0">
+      <NoTask>You have no upcoming tasks!</NoTask>
     </v-col>
-    <v-col cols="12" v-show="tasksUpcoming.length">
-      <TaskList :tasks="tasksUpcoming">
+    <v-col cols="12" v-show="getTasksUpcoming.length">
+      <TaskList :tasks="getTasksUpcoming">
         <template #header> Upcoming </template>
         <template #footer>
           <v-btn
@@ -29,28 +29,11 @@ import TaskList from '@/components/TaskList.vue'
 import { useTaskStore } from '@/stores/useTaskStore'
 import { mdiPlusCircle } from '@mdi/js'
 import { computed, ref } from 'vue'
-import { useDate } from 'vuetify/lib/framework.mjs'
-
-const dateAdapter = useDate()
-const TODAY = new Date()
-TODAY.setHours(0, 0, 0, 0)
 
 // task store logic
-const taskStore = useTaskStore()
-
-const tasks = computed(() => {
-  return Array.from(taskStore.tasks).map(([key, value]) => ({
-    key,
-    ...value,
-  }))
-})
-
-const tasksUpcoming = computed(() => {
-  return tasks.value.filter((task) => {
-    return (
-      dateAdapter.isAfterDay(new Date(task.date), TODAY) && !task.isComplete
-    )
-  })
+const store = useTaskStore()
+const getTasksUpcoming = computed(() => {
+  return store.getTasksUpcoming()
 })
 
 // TaskForm logic

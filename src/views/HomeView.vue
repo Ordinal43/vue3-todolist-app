@@ -1,15 +1,18 @@
 <template>
   <v-row>
-    <v-col cols="12" v-show="tasksToday.length + tasksOverdue.length === 0">
-      <NoTask />
+    <v-col
+      cols="12"
+      v-show="getTasksToday.length + getTasksOverdue.length === 0"
+    >
+      <NoTask>You have no overdue tasks!</NoTask>
     </v-col>
-    <v-col cols="12" v-show="tasksOverdue.length">
-      <TaskList :tasks="tasksOverdue">
+    <v-col cols="12" v-show="getTasksOverdue.length">
+      <TaskList :tasks="getTasksOverdue">
         <template #header> Overdue </template>
       </TaskList>
     </v-col>
-    <v-col cols="12" v-show="tasksToday.length">
-      <TaskList :tasks="tasksToday">
+    <v-col cols="12" v-show="getTasksToday.length">
+      <TaskList :tasks="getTasksToday">
         <template #header>
           {{ dateAdapter.format(TODAY, 'shortDate') }} - Today -
           {{ dateAdapter.format(TODAY, 'weekday') }}
@@ -44,25 +47,12 @@ const TODAY = new Date()
 TODAY.setHours(0, 0, 0, 0)
 
 // task store logic
-const taskStore = useTaskStore()
-
-const tasks = computed(() => {
-  return Array.from(taskStore.tasks).map(([key, value]) => ({
-    key,
-    ...value,
-  }))
+const store = useTaskStore()
+const getTasksToday = computed(() => {
+  return store.getTasksToday()
 })
-
-const tasksOverdue = computed(() => {
-  return tasks.value.filter((task) => {
-    return dateAdapter.isBefore(new Date(task.date), TODAY) && !task.isComplete
-  })
-})
-
-const tasksToday = computed(() => {
-  return tasks.value.filter((task) => {
-    return dateAdapter.isSameDay(new Date(task.date), TODAY) && !task.isComplete
-  })
+const getTasksOverdue = computed(() => {
+  return store.getTasksOverdue()
 })
 
 // TaskForm logic

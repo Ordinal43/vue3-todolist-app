@@ -14,7 +14,7 @@
       >
         <v-col cols="1">
           <v-checkbox
-            :model-value="task.isComplete"
+            :model-value="task.isCompleted"
             @update:model-value="(value) => completeTask(task.key, value)"
             color="red"
             hide-details
@@ -22,7 +22,7 @@
         </v-col>
         <v-col>
           <v-card @click="openTaskDetail(task.key)" class="pa-2" variant="text">
-            <h3 :class="getTaskStyle(task.isComplete)">
+            <h3 :class="getTaskStyle(task.isCompleted)">
               {{ task.name }}
             </h3>
             <p :class="getDueDateColor(task.date)">
@@ -74,8 +74,8 @@ const getOverdue = (date) => dateAdapter.isBefore(new Date(date), TODAY)
 const getDueDateColor = (date) => {
   return getOverdue(date) ? { 'text-red': true } : null
 }
-const getTaskStyle = (isComplete) => {
-  return isComplete ? { 'text-decoration-line-through': true } : null
+const getTaskStyle = (isCompleted) => {
+  return isCompleted ? { 'text-decoration-line-through': true } : null
 }
 
 const completeTask = (key, value) => {
