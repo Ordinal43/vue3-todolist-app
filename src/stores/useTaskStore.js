@@ -27,6 +27,15 @@ export const useTaskStore = defineStore('task', () => {
     tasks.value.get(key).isCompleted = isCompleted
   }
 
+  const updateTaskValue = (key, { name, desc }) => {
+    tasks.value.get(key).name = name
+    tasks.value.get(key).desc = desc
+  }
+
+  const updateTaskDate = (key, date) => {
+    tasks.value.get(key).date = date
+  }
+
   // getters
   const dateAdapter = useDate()
   const TODAY = new Date()
@@ -78,6 +87,8 @@ export const useTaskStore = defineStore('task', () => {
     addNewTask,
     deleteTask,
     setTaskComplete,
+    updateTaskValue,
+    updateTaskDate,
     getTasksToday,
     getTasksOverdue,
     getTasksUpcoming,
