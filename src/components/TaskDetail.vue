@@ -2,7 +2,7 @@
   <v-dialog
     :model-value="show"
     @update:model-value="(value) => (show = value)"
-    maxWidth="600"
+    maxWidth="850"
   >
     <v-card v-if="getTaskDetails">
       <v-card-title>
