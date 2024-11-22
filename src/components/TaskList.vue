@@ -23,7 +23,7 @@
     </v-list>
   </v-card>
 
-  <TaskDetail v-model="showTaskDetail" :id-task="idTask" />
+  <TaskDetail v-model="showTaskDetail" />
 </template>
 
 <script setup>
@@ -49,9 +49,8 @@ const deleteTask = (key) => {
 
 // TaskDetail logic
 const showTaskDetail = ref(false)
-const idTask = ref(null)
 const openTaskDetail = (key) => {
-  idTask.value = key
+  taskStore.setActiveKey(key)
   showTaskDetail.value = true
 }
 </script>

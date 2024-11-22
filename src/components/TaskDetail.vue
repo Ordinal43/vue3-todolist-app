@@ -30,15 +30,8 @@ const closeForm = () => {
   show.value = false
 }
 
-// task details logic
-const { idTask } = defineProps({
-  idTask: {
-    type: String,
-  },
-})
-
 const taskStore = useTaskStore()
 const getTaskDetails = computed(() => {
-  return taskStore.getTask(idTask)
+  return taskStore.getTask(taskStore.activeKey)
 })
 </script>
