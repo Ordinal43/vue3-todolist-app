@@ -1,17 +1,11 @@
 <template>
   <v-row>
-    <v-col
-      cols="12"
-      v-show="getTasksToday.length + getTasksOverdue.length === 0"
-    >
-      <NoTask>You have no overdue tasks!</NoTask>
-    </v-col>
-    <v-col cols="12" v-show="getTasksOverdue.length">
+    <v-col cols="12">
       <TaskList :tasks="getTasksOverdue">
         <template #header> Overdue </template>
       </TaskList>
     </v-col>
-    <v-col cols="12" v-show="getTasksToday.length">
+    <v-col cols="12">
       <TaskList :tasks="getTasksToday">
         <template #header>
           {{ dateAdapter.format(TODAY, 'shortDate') }} - Today -
@@ -34,7 +28,6 @@
 </template>
 
 <script setup>
-import NoTask from '@/components/NoTask.vue'
 import TaskForm from '@/components/TaskForm.vue'
 import TaskList from '@/components/TaskList.vue'
 import { useTaskStore } from '@/stores/useTaskStore'

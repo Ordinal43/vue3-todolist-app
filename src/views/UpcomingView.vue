@@ -1,9 +1,6 @@
 <template>
   <v-row>
-    <v-col cols="12" v-show="getTasksUpcoming.length === 0">
-      <NoTask>You have no upcoming tasks!</NoTask>
-    </v-col>
-    <v-col cols="12" v-show="getTasksUpcoming.length">
+    <v-col cols="12">
       <TaskList :tasks="getTasksUpcoming">
         <template #header> Upcoming </template>
         <template #footer>
@@ -23,7 +20,6 @@
 </template>
 
 <script setup>
-import NoTask from '@/components/NoTask.vue'
 import TaskForm from '@/components/TaskForm.vue'
 import TaskList from '@/components/TaskList.vue'
 import { useTaskStore } from '@/stores/useTaskStore'
