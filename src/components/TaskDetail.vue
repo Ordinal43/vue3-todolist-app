@@ -1,5 +1,5 @@
 <template>
-  <v-dialog v-model="show" maxWidth="700">
+  <v-dialog v-model="show" maxWidth="800">
     <v-card v-if="getTaskDetails">
       <v-card-title class="d-flex align-center">
         <v-spacer></v-spacer>
