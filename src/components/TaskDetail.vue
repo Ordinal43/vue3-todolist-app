@@ -14,14 +14,8 @@
       <v-card-text>
         <v-row no-gutters>
           <v-col cols="12" md="9">
-            <div v-show="!showEditForm">
-              <h4>{{ getTaskDetails.name }}</h4>
-              <v-divider class="my-2"></v-divider>
-              <p v-if="getTaskDetails.desc">{{ getTaskDetails.desc }}</p>
-              <p v-else class="text-grey">Description...</p>
-            </div>
             <v-form
-              v-show="showEditForm"
+              v-if="showEditForm"
               ref="form-task"
               v-model="isFormValid"
               validate-on="lazy"
@@ -47,6 +41,12 @@
                 variant="outlined"
               ></v-textarea>
             </v-form>
+            <div v-else>
+              <h4>{{ getTaskDetails.name }}</h4>
+              <v-divider class="my-2"></v-divider>
+              <p v-if="getTaskDetails.desc">{{ getTaskDetails.desc }}</p>
+              <p v-else class="text-grey">No Description...</p>
+            </div>
           </v-col>
           <v-col cols="12" md="3" class="d-flex flex-column align-end">
             <v-menu
