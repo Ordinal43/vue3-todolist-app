@@ -1,7 +1,7 @@
 <template>
   <v-dialog
     :model-value="showTaskDetail"
-    @update:model-value="closeForm"
+    @update:model-value="closeDetailModal"
     max-width="850"
     min-height="500"
   >
@@ -47,7 +47,7 @@
         </template>
         <v-spacer></v-spacer>
         <v-btn
-          @click="closeForm"
+          @click="closeDetailModal"
           :icon="mdiClose"
           density="compact"
           variant="text"
@@ -229,18 +229,10 @@
       </v-card-text>
     </v-card>
   </v-dialog>
-  <v-card> </v-card>
 </template>
 
 <script setup>
-import {
-  computed,
-  nextTick,
-  provide,
-  ref,
-  useTemplateRef,
-  watchEffect,
-} from 'vue'
+import { computed, nextTick, provide, ref, watchEffect } from 'vue'
 import {
   mdiCalendar,
   mdiCheck,
@@ -249,29 +241,35 @@ import {
   mdiFileTree,
   mdiFlag,
 } from '@mdi/js'
-import { useFormRules } from '@/composables/useFormRules'
 import { useTaskStore } from '@/stores/useTaskStore'
+import { useDetailStore } from '@/stores/useDetailStore'
 import { useDatePicker } from '@/composables/useDatePicker'
 import { useTaskPriority } from '@/composables/useTaskPriority'
 import { useTaskDetailModal } from '@/composables/useTaskDetailModal'
+import { useFormInputs } from '@/composables/useFormInputs'
 import TaskList from './TaskList.vue'
 import TaskDetailMenu from './TaskDetailMenu.vue'
 
 const taskStore = useTaskStore()
+const detailStore = useDetailStore()
 const { minDate, menuDatePicker, formatDate, setDateAndClose } = useDatePicker()
 const { menuPriority, priorityOptions, getPriorityColor, setPriorityAndClose } =
   useTaskPriority()
 const { openTaskDetail } = useTaskDetailModal()
+const { form, isFormValid, inputTaskNameRef, setFormData } = useFormInputs()
 
 // dialog logic
 const showTaskDetail = computed(() => {
-  return taskStore.showTaskDetail
+  return detailStore.showTaskDetail
 })
-const closeForm = () => {
-  taskStore.setShowTaskDetail(false)
+
+const closeDetailModal = () => {
+  detailStore.setShowTaskDetail(false)
 }
+
+// task details logic
 const getTaskDetails = computed(() => {
-  return taskStore.tasks.get(taskStore.activeKey)
+  return taskStore.tasks.get(detailStore.activeKey)
 })
 
 // parent task logic
@@ -280,6 +278,7 @@ const getParentTask = computed(() => {
   if (parentKey === null) return null
   return taskStore.tasks.get(parentKey)
 })
+
 const getSiblingTasks = computed(() => {
   return taskStore.getSubtasks(getTaskDetails.value.parentKey)
 })
@@ -294,59 +293,39 @@ const setTaskStatus = async (key, value) => {
 // subtasks store logic
 provide('isSubtaskForm', true)
 const getSubtasks = computed(() => {
-  return taskStore.getSubtasks(taskStore.activeKey)
+  return taskStore.getSubtasks(detailStore.activeKey)
 })
 
 // input logic
-const { ruleRequired, ruleMaxLen } = useFormRules()
-const getInitialData = () => ({
-  taskName: {
-    val: '',
-    label: 'Task Name',
-    rules: [ruleRequired, (value) => ruleMaxLen(value, 150)],
-  },
-  taskDesc: {
-    val: '',
-    label: 'Task Description',
-    rules: [(value) => ruleMaxLen(value, 300)],
-  },
-  taskDate: {
-    val: '',
-  },
-  taskPriority: {
-    val: 4,
-  },
-})
-
-// form logic
-const inputTaskNameEl = useTemplateRef('input-task-name')
-const form = ref(getInitialData())
-
 const showEditForm = ref(false)
+
 const openEditForm = async () => {
   showEditForm.value = true
   await nextTick()
-  inputTaskNameEl.value.focus()
+  inputTaskNameRef.value.focus()
 }
+
 const closeEditForm = () => {
   showEditForm.value = false
-  resetForm()
+  setFormToInitial()
 }
 
-const resetForm = () => {
+const setFormToInitial = () => {
   const { name, desc, date, priority } = getTaskDetails.value
-
-  form.value.taskName.val = name
-  form.value.taskDesc.val = desc
-  form.value.taskDate.val = new Date(date)
-  form.value.taskPriority.val = priority
+  setFormData({
+    name: name,
+    desc: desc,
+    dateStr: date,
+    priority: priority,
+  })
 }
 
 watchEffect(() => {
   if (getTaskDetails.value) {
-    resetForm()
+    setFormToInitial()
   }
 })
+
 watchEffect(async () => {
   if (showTaskDetail.value === false) {
     await nextTick()
@@ -354,11 +333,10 @@ watchEffect(async () => {
   }
 })
 
-const isFormValid = ref()
 const submitForm = () => {
   if (isFormValid.value === true) {
     const { taskName, taskDesc } = form.value
-    taskStore.updateTaskValue(taskStore.activeKey, {
+    taskStore.updateTaskValue(detailStore.activeKey, {
       name: taskName.val,
       desc: taskDesc.val,
     })
@@ -366,16 +344,17 @@ const submitForm = () => {
   }
 }
 
-// date-picker logic
+// menu date-picker logic
 const setTaskDate = (event) => {
   setDateAndClose(() => {
-    taskStore.updateTaskDate(taskStore.activeKey, event)
+    taskStore.updateTaskDate(detailStore.activeKey, event)
   })
 }
 
+// menu priority logic
 const setTaskPriority = (priority) => {
   setPriorityAndClose(() => {
-    taskStore.updateTaskPriority(taskStore.activeKey, priority)
+    taskStore.updateTaskPriority(detailStore.activeKey, priority)
   })
 }
 </script>

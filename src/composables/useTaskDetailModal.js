@@ -1,10 +1,10 @@
-import { useTaskStore } from '@/stores/useTaskStore'
+import { useDetailStore } from '@/stores/useDetailStore'
 
 export const useTaskDetailModal = () => {
-  const taskStore = useTaskStore()
+  const detailStore = useDetailStore()
 
   const openTaskDetail = (key) => {
-    taskStore.setActiveKey(key)
+    detailStore.setActiveKey(key)
   }
 
   return {

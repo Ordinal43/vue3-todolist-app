@@ -1,4 +1,4 @@
-import { computed, ref } from 'vue'
+import { computed } from 'vue'
 import { useLocalStorage } from '@vueuse/core'
 import { defineStore } from 'pinia'
 import { v4 as uuidv4 } from 'uuid'
@@ -134,19 +134,6 @@ export const useTaskStore = defineStore('task', () => {
     })
   }
 
-  // active task logic
-  const activeKey = ref(null)
-  const showTaskDetail = ref(false)
-
-  const setActiveKey = (key) => {
-    activeKey.value = key
-    showTaskDetail.value = true
-  }
-
-  const setShowTaskDetail = (value) => {
-    showTaskDetail.value = value
-  }
-
   return {
     tasks,
     clearStorage,
@@ -161,9 +148,5 @@ export const useTaskStore = defineStore('task', () => {
     getTasksUpcoming,
     getTasksCompleted,
     getSubtasks,
-    activeKey,
-    showTaskDetail,
-    setActiveKey,
-    setShowTaskDetail,
   }
 })
