@@ -20,7 +20,7 @@
 import { computed } from 'vue'
 import { useDate } from 'vuetify'
 import { useTaskStore } from '@/stores/useTaskStore'
-import { useCustomDate } from '@/composables/useCustomDate';
+import { useCustomDate } from '@/composables/useCustomDate'
 import TaskList from '@/components/TaskList.vue'
 
 const dateAdapter = useDate()
