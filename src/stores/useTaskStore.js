@@ -3,12 +3,14 @@ import { useLocalStorage } from '@vueuse/core'
 import { defineStore } from 'pinia'
 import { v4 as uuidv4 } from 'uuid'
 import { useDate } from 'vuetify'
+import { useCustomDate } from '@/composables/useCustomDate'
 
 const LOCAL_STORAGE_KEY = 'todo-list-tasks'
 
 export const useTaskStore = defineStore('task', () => {
   // task CRUD logic
   const tasks = useLocalStorage(LOCAL_STORAGE_KEY, new Map())
+  const { todayMidnight } = useCustomDate()
 
   const clearStorage = () => {
     tasks.value = new Map()
@@ -82,8 +84,6 @@ export const useTaskStore = defineStore('task', () => {
 
   // getters
   const dateAdapter = useDate()
-  const TODAY = new Date()
-  TODAY.setHours(0, 0, 0, 0)
 
   const getTasksArray = () => {
     return Array.from(tasks.value).map(([key, value]) => ({
@@ -95,7 +95,7 @@ export const useTaskStore = defineStore('task', () => {
   const getTasksToday = () => {
     return getTasksArray().filter((task) => {
       return (
-        dateAdapter.isSameDay(new Date(task.date), TODAY) &&
+        dateAdapter.isSameDay(new Date(task.date), todayMidnight) &&
         !task.isCompleted &&
         task.parentKey === null
       )
@@ -104,7 +104,7 @@ export const useTaskStore = defineStore('task', () => {
   const getTasksOverdue = () => {
     return getTasksArray().filter((task) => {
       return (
-        dateAdapter.isBefore(new Date(task.date), TODAY) &&
+        dateAdapter.isBefore(new Date(task.date), todayMidnight) &&
         !task.isCompleted &&
         task.parentKey === null
       )
@@ -113,7 +113,7 @@ export const useTaskStore = defineStore('task', () => {
   const getTasksUpcoming = () => {
     return getTasksArray().filter((task) => {
       return (
-        dateAdapter.isAfterDay(new Date(task.date), TODAY) &&
+        dateAdapter.isAfterDay(new Date(task.date), todayMidnight) &&
         !task.isCompleted &&
         task.parentKey === null
       )

@@ -86,10 +86,12 @@ import {
   mdiTrashCan,
 } from '@mdi/js'
 import { useTaskStore } from '@/stores/useTaskStore'
+import { useCustomDate } from '@/composables/useCustomDate'
 import TaskForm from './TaskForm.vue'
 
 const dateAdapter = useDate()
 const taskStore = useTaskStore()
+const { todayMidnight } = useCustomDate()
 
 defineProps({
   tasks: {
@@ -102,11 +104,7 @@ defineProps({
   },
 })
 
-// tasks logic
-const TODAY = new Date()
-TODAY.setHours(0, 0, 0, 0)
-
-const getOverdue = (date) => dateAdapter.isBefore(new Date(date), TODAY)
+const getOverdue = (date) => dateAdapter.isBefore(new Date(date), todayMidnight)
 const getDueDateColor = (date) => {
   return getOverdue(date) ? 'red' : null
 }
