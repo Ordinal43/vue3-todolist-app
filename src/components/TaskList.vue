@@ -92,11 +92,13 @@ import { useTaskDetailModal } from '@/composables/useTaskDetailModal'
 import TaskForm from './TaskForm.vue'
 
 const dateAdapter = useDate()
-const taskStore = useTaskStore()
 const { todayMidnight } = useCustomDate()
 const { getPriorityColor } = useTaskPriority()
 const { showTaskForm, openTaskForm } = useTaskForm()
 const { openTaskDetail } = useTaskDetailModal()
+
+const taskStore = useTaskStore()
+const { setTaskStatus, deleteTask } = taskStore
 
 defineProps({
   tasks: {
@@ -115,13 +117,5 @@ const getDueDateColor = (date) => {
 }
 const getTaskStyle = (isCompleted) => {
   return isCompleted ? { 'text-decoration-line-through': true } : null
-}
-
-const setTaskStatus = async (key, value) => {
-  await taskStore.setTaskStatus(key, value)
-}
-
-const deleteTask = async (key, parentKey) => {
-  await taskStore.deleteTask(key, parentKey)
 }
 </script>
