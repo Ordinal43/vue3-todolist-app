@@ -10,7 +10,7 @@ export const useTaskStore = defineStore('task', () => {
   // task CRUD logic
   const tasks = useLocalStorage(LOCAL_STORAGE_KEY, new Map())
 
-  const addNewTask = (parentKey, level = 0, { name, desc, date }) => {
+  const addNewTask = (parentKey, level = 0, { name, desc, date, priority }) => {
     const newId = uuidv4()
 
     tasks.value.set(newId, {
@@ -20,6 +20,7 @@ export const useTaskStore = defineStore('task', () => {
       name,
       desc,
       date,
+      priority,
       level: level + 1,
       isCompleted: false,
     })
@@ -69,6 +70,10 @@ export const useTaskStore = defineStore('task', () => {
 
   const updateTaskDate = (key, date) => {
     tasks.value.get(key).date = date
+  }
+
+  const updateTaskPriority = (key, priority) => {
+    tasks.value.get(key).priority = priority
   }
 
   // getters
@@ -141,6 +146,7 @@ export const useTaskStore = defineStore('task', () => {
     setTaskStatus,
     updateTaskValue,
     updateTaskDate,
+    updateTaskPriority,
     getTasksToday,
     getTasksOverdue,
     getTasksUpcoming,

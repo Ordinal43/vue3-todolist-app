@@ -31,7 +31,7 @@
             variant="plain"
           ></v-textarea>
 
-          <div class="mt-5">
+          <div class="mt-5 d-flex ga-2">
             <v-menu
               v-model="menuDatePicker"
               :close-on-content-click="false"
@@ -40,7 +40,6 @@
               <template v-slot:activator="{ props }">
                 <v-btn
                   :prepend-icon="mdiCalendar"
-                  color="primary"
                   variant="outlined"
                   size="small"
                   v-bind="props"
@@ -55,6 +54,44 @@
                 :min="minDate"
                 hide-header
               ></v-date-picker>
+            </v-menu>
+
+            <v-menu
+              v-model="menuPriority"
+              :close-on-content-click="false"
+              location="bottom"
+            >
+              <template v-slot:activator="{ props }">
+                <v-btn
+                  :prepend-icon="mdiFlag"
+                  :color="getPriorityColor"
+                  variant="outlined"
+                  size="small"
+                  v-bind="props"
+                >
+                  {{
+                    form.taskPriority.val < 4
+                      ? `P${form.taskPriority.val}`
+                      : 'Priority'
+                  }}
+                </v-btn>
+              </template>
+
+              <v-list>
+                <v-list-item
+                  v-for="(item, i) in priorityOptions"
+                  :key="`prio-${i}`"
+                  :base-color="item.color"
+                  @click="setTaskPriority(item.value)"
+                >
+                  <template #prepend>
+                    <v-icon :icon="mdiFlag"></v-icon>
+                  </template>
+                  <v-list-item-title
+                    >Priority {{ item.value }}</v-list-item-title
+                  >
+                </v-list-item>
+              </v-list>
             </v-menu>
           </div>
         </v-card-text>
@@ -92,11 +129,9 @@ import {
 } from 'vue'
 import { useDate } from 'vuetify'
 import { VDialog } from 'vuetify/components/VDialog'
-import { mdiCalendar, mdiClose } from '@mdi/js'
+import { mdiCalendar, mdiClose, mdiFlag } from '@mdi/js'
 import { useFormRules } from '@/composables/useFormRules'
 import { useTaskStore } from '@/stores/useTaskStore'
-
-const dateAdapter = useDate()
 
 // dialog logic
 const showForm = defineModel()
@@ -139,7 +174,8 @@ const getVariant = computed(() => {
   }
 })
 
-// date-picker logic
+// menu date-picker logic
+const dateAdapter = useDate()
 const menuDatePicker = ref(false)
 const formattedDate = computed(() =>
   dateAdapter.format(form.value.taskDate.val, 'normalDateWithWeekday'),
@@ -148,6 +184,31 @@ const setTaskDate = (event) => {
   form.value.taskDate.val = event
   menuDatePicker.value = false
 }
+
+// menu priority logic
+const menuPriority = ref(false)
+const priorityOptions = [
+  { value: 1, color: 'red' },
+  { value: 2, color: 'yellow' },
+  { value: 3, color: 'blue' },
+  { value: 4, color: 'grey' },
+]
+const setTaskPriority = (priority) => {
+  form.value.taskPriority.val = priority
+  menuPriority.value = false
+}
+const getPriorityColor = computed(() => {
+  switch (form.value.taskPriority.val) {
+    case 1:
+      return 'red'
+    case 2:
+      return 'yellow'
+    case 3:
+      return 'blue'
+    default:
+      return 'grey'
+  }
+})
 
 // input logic
 const { ruleRequired, ruleMaxLen } = useFormRules()
@@ -170,6 +231,9 @@ const getInitialData = () => ({
   },
   taskDate: {
     val: currentDate,
+  },
+  taskPriority: {
+    val: 4,
   },
 })
 
@@ -194,7 +258,7 @@ const isSubtaskForm = inject('isSubtaskForm', false)
 
 const submitForm = () => {
   if (isFormValid.value === true) {
-    const { taskName, taskDesc, taskDate } = form.value
+    const { taskName, taskDesc, taskDate, taskPriority } = form.value
     const parentKey = isSubtaskForm ? taskStore.activeKey : null
     const parentLevel = taskStore.tasks.get(parentKey)?.level ?? 0
 
@@ -202,6 +266,7 @@ const submitForm = () => {
       name: taskName.val,
       desc: taskDesc.val,
       date: taskDate.val,
+      priority: taskPriority.val,
     })
     closeForm()
     snackbar.value = true
