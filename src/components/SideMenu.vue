@@ -58,6 +58,7 @@
 <script setup>
 import { computed } from 'vue'
 import { useRouter } from 'vue-router'
+import { storeToRefs } from 'pinia'
 import { mdiPlusCircle, mdiTrashCan } from '@mdi/js'
 import { useTaskStore } from '@/stores/useTaskStore'
 import { useTaskForm } from '@/composables/useTaskForm'
@@ -70,6 +71,8 @@ import {
 } from '@/constants'
 
 const taskStore = useTaskStore()
+const { getTasksOverdue, getTasksToday, getTasksUpcoming, getTasksCompleted } =
+  storeToRefs(taskStore)
 const { showTaskForm, openTaskForm } = useTaskForm()
 const { dialog, warningMessage, openDialog, closeDialog, clearStorage } =
   useClearStorage()
@@ -80,24 +83,14 @@ const routes = computed(() => {
 })
 
 // sidemenu logic
-const amountTasksTodayAndOverdue = computed(() => {
-  return taskStore.getTasksOverdue().length + taskStore.getTasksToday().length
-})
-const amountTasksUpcoming = computed(() => {
-  return taskStore.getTasksUpcoming().length
-})
-const amountTasksCompleted = computed(() => {
-  return taskStore.getTasksCompleted().length
-})
-
 const getAmount = (routeName) => {
   switch (routeName) {
     case ROUTE_NAME_TODAY:
-      return amountTasksTodayAndOverdue.value
+      return getTasksOverdue.length + getTasksToday.length
     case ROUTE_NAME_UPCOMING:
-      return amountTasksUpcoming.value
+      return getTasksUpcoming.length
     case ROUTE_NAME_FINISHED:
-      return amountTasksCompleted.value
+      return getTasksCompleted.length
   }
 }
 const getProps = (routeName) => {

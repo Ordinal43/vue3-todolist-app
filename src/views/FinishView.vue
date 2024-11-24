@@ -9,13 +9,11 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { storeToRefs } from 'pinia'
 import { useTaskStore } from '@/stores/useTaskStore'
 import TaskList from '@/components/TaskList.vue'
 
 // task store logic
 const taskStore = useTaskStore()
-const getTasksCompleted = computed(() => {
-  return taskStore.getTasksCompleted()
-})
+const { getTasksCompleted } = storeToRefs(taskStore)
 </script>

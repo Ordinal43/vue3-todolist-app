@@ -1,4 +1,4 @@
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import { useLocalStorage } from '@vueuse/core'
 import { defineStore } from 'pinia'
 import { v4 as uuidv4 } from 'uuid'
@@ -85,45 +85,49 @@ export const useTaskStore = defineStore('task', () => {
   // getters
   const dateAdapter = useDate()
 
-  const getTasksArray = () => {
+  const getTasksArray = computed(() => {
     return Array.from(tasks.value).map(([key, value]) => ({
       key,
       ...value,
     }))
-  }
+  })
 
-  const getTasksToday = () => {
-    return getTasksArray().filter((task) => {
+  const getTasksToday = computed(() => {
+    return getTasksArray.value.filter((task) => {
       return (
         dateAdapter.isSameDay(new Date(task.date), todayMidnight) &&
         !task.isCompleted &&
         task.parentKey === null
       )
     })
-  }
-  const getTasksOverdue = () => {
-    return getTasksArray().filter((task) => {
+  })
+
+  const getTasksOverdue = computed(() => {
+    return getTasksArray.value.filter((task) => {
       return (
         dateAdapter.isBefore(new Date(task.date), todayMidnight) &&
         !task.isCompleted &&
         task.parentKey === null
       )
     })
-  }
-  const getTasksUpcoming = () => {
-    return getTasksArray().filter((task) => {
+  })
+
+  const getTasksUpcoming = computed(() => {
+    return getTasksArray.value.filter((task) => {
       return (
         dateAdapter.isAfterDay(new Date(task.date), todayMidnight) &&
         !task.isCompleted &&
         task.parentKey === null
       )
     })
-  }
-  const getTasksCompleted = () => {
-    return getTasksArray().filter((task) => {
+  })
+
+  const getTasksCompleted = computed(() => {
+    return getTasksArray.value.filter((task) => {
       return task.isCompleted
     })
-  }
+  })
+
   const getSubtasks = (key) => {
     return tasks.value.get(key).childKeys.map((key) => {
       return tasks.value.get(key)

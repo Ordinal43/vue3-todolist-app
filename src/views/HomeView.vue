@@ -17,21 +17,15 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
 import { useDate } from 'vuetify'
+import { storeToRefs } from 'pinia'
 import { useTaskStore } from '@/stores/useTaskStore'
 import { useCustomDate } from '@/composables/useCustomDate'
 import TaskList from '@/components/TaskList.vue'
 
 const dateAdapter = useDate()
-const { todayMidnight } = useCustomDate()
-
-// task store logic
 const taskStore = useTaskStore()
-const getTasksToday = computed(() => {
-  return taskStore.getTasksToday()
-})
-const getTasksOverdue = computed(() => {
-  return taskStore.getTasksOverdue()
-})
+
+const { getTasksToday, getTasksOverdue } = storeToRefs(taskStore)
+const { todayMidnight } = useCustomDate()
 </script>
