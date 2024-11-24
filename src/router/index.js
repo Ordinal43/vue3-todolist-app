@@ -1,12 +1,17 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import { mdiCalendarToday, mdiCalendarRange, mdiCalendarCheck } from '@mdi/js'
+import {
+  ROUTE_NAME_TODAY,
+  ROUTE_NAME_UPCOMING,
+  ROUTE_NAME_FINISHED,
+} from '@/constants'
 
 export const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
       path: '/',
-      name: 'today',
+      name: ROUTE_NAME_TODAY,
       component: () => import('@/views/HomeView.vue'),
       meta: {
         icon: mdiCalendarToday,
@@ -15,7 +20,7 @@ export const router = createRouter({
     },
     {
       path: '/upcoming',
-      name: 'upcoming',
+      name: ROUTE_NAME_UPCOMING,
       component: () => import('@/views/UpcomingView.vue'),
       meta: {
         icon: mdiCalendarRange,
@@ -24,7 +29,7 @@ export const router = createRouter({
     },
     {
       path: '/finished',
-      name: 'finished',
+      name: ROUTE_NAME_FINISHED,
       component: () => import('@/views/FinishView.vue'),
       meta: {
         icon: mdiCalendarCheck,
