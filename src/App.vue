@@ -18,14 +18,17 @@
         </v-container>
       </v-main>
     </v-layout>
+
+    <TaskDetail />
   </v-app>
 </template>
 
 <script setup>
 import { ref, watchEffect } from 'vue'
 import { RouterView, useRoute } from 'vue-router'
-import SideMenu from '@/components/SideMenu.vue'
 import { useDisplay } from 'vuetify'
+import SideMenu from '@/components/SideMenu.vue'
+import TaskDetail from './components/TaskDetail.vue'
 
 // nav drawer logic
 const showDrawer = ref(false)

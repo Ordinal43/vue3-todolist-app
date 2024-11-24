@@ -1,26 +1,42 @@
-import { defineStore } from 'pinia'
-import { useStorage } from '@vueuse/core'
-import { v4 as uuidv4 } from 'uuid'
 import { ref } from 'vue'
-import { useDate } from 'vuetify/lib/framework.mjs'
+import { useLocalStorage } from '@vueuse/core'
+import { defineStore } from 'pinia'
+import { v4 as uuidv4 } from 'uuid'
+import { useDate } from 'vuetify'
 
 const LOCAL_STORAGE_KEY = 'todo-list-tasks'
 
 export const useTaskStore = defineStore('task', () => {
   // task CRUD logic
-  const tasks = useStorage(LOCAL_STORAGE_KEY, new Map())
+  const tasks = useLocalStorage(LOCAL_STORAGE_KEY, new Map())
 
-  const addNewTask = (taskName, taskDesc, taskDate) => {
-    tasks.value.set(uuidv4(), {
-      name: taskName,
-      desc: taskDesc,
-      date: taskDate,
+  const addNewTask = (parentKey, level = 0, { name, desc, date }) => {
+    const newId = uuidv4()
+
+    tasks.value.set(newId, {
+      key: newId,
+      parentKey,
+      childKeys: [],
+      name,
+      desc,
+      date,
+      level: level + 1,
       isCompleted: false,
     })
+
+    if (parentKey !== null) {
+      tasks.value.get(parentKey).childKeys.push(newId)
+    }
   }
 
-  const deleteTask = (key) => {
+  const deleteTask = (key, parentKey) => {
     tasks.value.delete(key)
+    if (parentKey) {
+      const parentTask = tasks.value.get(parentKey)
+      parentTask.childKeys = parentTask.childKeys.filter((childKey) => {
+        return childKey !== key
+      })
+    }
   }
 
   const setTaskComplete = (key, isCompleted) => {
@@ -51,21 +67,27 @@ export const useTaskStore = defineStore('task', () => {
   const getTasksToday = () => {
     return getTasksArray().filter((task) => {
       return (
-        dateAdapter.isSameDay(new Date(task.date), TODAY) && !task.isCompleted
+        dateAdapter.isSameDay(new Date(task.date), TODAY) &&
+        !task.isCompleted &&
+        task.parentKey === null
       )
     })
   }
   const getTasksOverdue = () => {
     return getTasksArray().filter((task) => {
       return (
-        dateAdapter.isBefore(new Date(task.date), TODAY) && !task.isCompleted
+        dateAdapter.isBefore(new Date(task.date), TODAY) &&
+        !task.isCompleted &&
+        task.parentKey === null
       )
     })
   }
   const getTasksUpcoming = () => {
     return getTasksArray().filter((task) => {
       return (
-        dateAdapter.isAfterDay(new Date(task.date), TODAY) && !task.isCompleted
+        dateAdapter.isAfterDay(new Date(task.date), TODAY) &&
+        !task.isCompleted &&
+        task.parentKey === null
       )
     })
   }
@@ -74,12 +96,26 @@ export const useTaskStore = defineStore('task', () => {
       return task.isCompleted
     })
   }
+  const getSubtasks = (key) => {
+    return tasks.value
+      .get(key)
+      .childKeys.map((key) => {
+        return tasks.value.get(key)
+      })
+      .filter((task) => !task.isCompleted)
+  }
 
   // active task logic
   const activeKey = ref(null)
+  const showTaskDetail = ref(false)
 
   const setActiveKey = (key) => {
     activeKey.value = key
+    showTaskDetail.value = true
+  }
+
+  const setShowTaskDetail = (value) => {
+    showTaskDetail.value = value
   }
 
   return {
@@ -93,7 +129,10 @@ export const useTaskStore = defineStore('task', () => {
     getTasksOverdue,
     getTasksUpcoming,
     getTasksCompleted,
+    getSubtasks,
     activeKey,
+    showTaskDetail,
     setActiveKey,
+    setShowTaskDetail,
   }
 })

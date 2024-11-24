@@ -54,16 +54,16 @@ const openTaskForm = () => {
 }
 
 // sidemenu logic
-const store = useTaskStore()
+const taskStore = useTaskStore()
 
 const amountTasksTodayAndOverdue = computed(() => {
-  return store.getTasksOverdue().length + store.getTasksToday().length
+  return taskStore.getTasksOverdue().length + taskStore.getTasksToday().length
 })
 const amountTasksUpcoming = computed(() => {
-  return store.getTasksUpcoming().length
+  return taskStore.getTasksUpcoming().length
 })
 const amountTasksCompleted = computed(() => {
-  return store.getTasksCompleted().length
+  return taskStore.getTasksCompleted().length
 })
 
 const getAmount = (i) => {

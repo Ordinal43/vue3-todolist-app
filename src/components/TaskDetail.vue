@@ -1,5 +1,9 @@
 <template>
-  <v-dialog v-model="show" maxWidth="700">
+  <v-dialog
+    :model-value="showTaskDetail"
+    @update:model-value="closeForm"
+    maxWidth="800"
+  >
     <v-card v-if="getTaskDetails">
       <v-card-title class="d-flex align-center">
         <v-spacer></v-spacer>
@@ -14,14 +18,8 @@
       <v-card-text>
         <v-row no-gutters>
           <v-col cols="12" md="9">
-            <div v-show="!showEditForm">
-              <h4>{{ getTaskDetails.name }}</h4>
-              <v-divider class="my-2"></v-divider>
-              <p v-if="getTaskDetails.desc">{{ getTaskDetails.desc }}</p>
-              <p v-else class="text-grey">Description...</p>
-            </div>
             <v-form
-              v-show="showEditForm"
+              v-if="showEditForm"
               ref="form-task"
               v-model="isFormValid"
               validate-on="lazy"
@@ -47,6 +45,19 @@
                 variant="outlined"
               ></v-textarea>
             </v-form>
+            <div v-else>
+              <h4>{{ getTaskDetails.name }}</h4>
+              <v-divider class="my-2"></v-divider>
+              <p v-if="getTaskDetails.desc">{{ getTaskDetails.desc }}</p>
+              <p v-else class="text-grey">No Description...</p>
+            </div>
+            <TaskList
+              v-if="getTaskDetails.level < 5"
+              :tasks="getSubtasks"
+              has-action
+            >
+              <template #header> Subtask </template>
+            </TaskList>
           </v-col>
           <v-col cols="12" md="3" class="d-flex flex-column align-end">
             <v-menu
@@ -91,22 +102,35 @@
 </template>
 
 <script setup>
+import {
+  computed,
+  nextTick,
+  provide,
+  ref,
+  useTemplateRef,
+  watchEffect,
+} from 'vue'
+import { useDate } from 'vuetify'
+import { mdiCalendar, mdiClose } from '@mdi/js'
 import { useFormRules } from '@/composables/useFormRules'
 import { useTaskStore } from '@/stores/useTaskStore'
-import { mdiCalendar, mdiClose } from '@mdi/js'
-import { computed, nextTick, ref, useTemplateRef, watchEffect } from 'vue'
-import { useDate } from 'vuetify/lib/framework.mjs'
-
-// dialog logic
-const show = defineModel()
-const closeForm = () => {
-  show.value = false
-}
+import TaskList from './TaskList.vue'
 
 const taskStore = useTaskStore()
+
+// dialog logic
+const showTaskDetail = computed(() => {
+  return taskStore.showTaskDetail
+})
+const closeForm = () => {
+  taskStore.setShowTaskDetail(false)
+}
+
 const getTaskDetails = computed(() => {
   return taskStore.tasks.get(taskStore.activeKey)
 })
+// provide for TaskForm
+provide('isSubtaskForm', true)
 
 // input logic
 const { ruleRequired, ruleMaxLen } = useFormRules()
@@ -155,7 +179,7 @@ watchEffect(() => {
   }
 })
 watchEffect(async () => {
-  if (show.value === false) {
+  if (showTaskDetail.value === false) {
     await nextTick()
     showEditForm.value = false
   }
@@ -187,4 +211,9 @@ const setTaskDate = (event) => {
   taskStore.updateTaskDate(taskStore.activeKey, event)
   menuDatePicker.value = false
 }
+
+// subtasks store logic
+const getSubtasks = computed(() => {
+  return taskStore.getSubtasks(taskStore.activeKey)
+})
 </script>
