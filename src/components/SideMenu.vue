@@ -56,31 +56,30 @@
   </v-dialog>
 </template>
 <script setup>
-import { computed, ref } from 'vue'
+import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { mdiPlusCircle, mdiTrashCan } from '@mdi/js'
 import { useTaskStore } from '@/stores/useTaskStore'
+import { useTaskForm } from '@/composables/useTaskForm'
+import { useClearStorage } from '@/composables/useClearStorage'
 import TaskForm from './TaskForm.vue'
 import {
   ROUTE_NAME_TODAY,
   ROUTE_NAME_UPCOMING,
   ROUTE_NAME_FINISHED,
 } from '@/constants'
-import { useClearStorage } from '@/composables/useClearStorage'
 
+const taskStore = useTaskStore()
+const { showTaskForm, openTaskForm } = useTaskForm()
+const { dialog, warningMessage, openDialog, closeDialog, clearStorage } =
+  useClearStorage()
+
+// route logic
 const routes = computed(() => {
   return useRouter().getRoutes()
 })
 
-// TaskForm logic
-const showTaskForm = ref(false)
-const openTaskForm = () => {
-  showTaskForm.value = true
-}
-
 // sidemenu logic
-const taskStore = useTaskStore()
-
 const amountTasksTodayAndOverdue = computed(() => {
   return taskStore.getTasksOverdue().length + taskStore.getTasksToday().length
 })
@@ -117,8 +116,4 @@ const getProps = (routeName) => {
       }
   }
 }
-
-// clear storage composable
-const { dialog, warningMessage, openDialog, closeDialog, clearStorage } =
-  useClearStorage()
 </script>

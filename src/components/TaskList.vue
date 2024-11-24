@@ -77,7 +77,6 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
 import { useDate } from 'vuetify'
 import {
   mdiCalendarClock,
@@ -87,13 +86,15 @@ import {
 } from '@mdi/js'
 import { useTaskStore } from '@/stores/useTaskStore'
 import { useCustomDate } from '@/composables/useCustomDate'
-import TaskForm from './TaskForm.vue'
 import { useTaskPriority } from '@/composables/useTaskPriority'
+import { useTaskForm } from '@/composables/useTaskForm'
+import TaskForm from './TaskForm.vue'
 
 const dateAdapter = useDate()
 const taskStore = useTaskStore()
 const { todayMidnight } = useCustomDate()
 const { getPriorityColor } = useTaskPriority()
+const { showTaskForm, openTaskForm } = useTaskForm()
 
 defineProps({
   tasks: {
@@ -120,12 +121,6 @@ const setTaskStatus = async (key, value) => {
 
 const deleteTask = async (key, parentKey) => {
   await taskStore.deleteTask(key, parentKey)
-}
-
-// TaskForm logic
-const showTaskForm = ref(false)
-const openTaskForm = () => {
-  showTaskForm.value = true
 }
 
 // show task logic
