@@ -88,10 +88,12 @@ import {
 import { useTaskStore } from '@/stores/useTaskStore'
 import { useCustomDate } from '@/composables/useCustomDate'
 import TaskForm from './TaskForm.vue'
+import { useTaskPriority } from '@/composables/useTaskPriority'
 
 const dateAdapter = useDate()
 const taskStore = useTaskStore()
 const { todayMidnight } = useCustomDate()
+const { getPriorityColor } = useTaskPriority()
 
 defineProps({
   tasks: {
@@ -129,19 +131,5 @@ const openTaskForm = () => {
 // show task logic
 const openTaskDetail = (key) => {
   taskStore.setActiveKey(key)
-}
-
-// priority logic
-const getPriorityColor = (value) => {
-  switch (value) {
-    case 1:
-      return 'red'
-    case 2:
-      return 'yellow'
-    case 3:
-      return 'blue'
-    default:
-      return 'grey'
-  }
 }
 </script>

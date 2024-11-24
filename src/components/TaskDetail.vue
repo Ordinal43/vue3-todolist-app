@@ -256,11 +256,14 @@ import {
 import { useFormRules } from '@/composables/useFormRules'
 import { useTaskStore } from '@/stores/useTaskStore'
 import { useDatePicker } from '@/composables/useDatePicker'
+import { useTaskPriority } from '@/composables/useTaskPriority'
 import TaskList from './TaskList.vue'
 import TaskDetailMenu from './TaskDetailMenu.vue'
 
 const taskStore = useTaskStore()
 const { minDate, menuDatePicker, formatDate, setDateAndClose } = useDatePicker()
+const { menuPriority, priorityOptions, getPriorityColor, setPriorityAndClose } =
+  useTaskPriority()
 
 // dialog logic
 const showTaskDetail = computed(() => {
@@ -376,28 +379,9 @@ const setTaskDate = (event) => {
   })
 }
 
-// menu priority logic
-const menuPriority = ref(false)
-const priorityOptions = [
-  { value: 1, color: 'red' },
-  { value: 2, color: 'yellow' },
-  { value: 3, color: 'blue' },
-  { value: 4, color: 'grey' },
-]
-const getPriorityColor = (value) => {
-  switch (value) {
-    case 1:
-      return 'red'
-    case 2:
-      return 'yellow'
-    case 3:
-      return 'blue'
-    default:
-      return 'grey'
-  }
-}
 const setTaskPriority = (priority) => {
-  taskStore.updateTaskPriority(taskStore.activeKey, priority)
-  menuPriority.value = false
+  setPriorityAndClose(() => {
+    taskStore.updateTaskPriority(taskStore.activeKey, priority)
+  })
 }
 </script>
