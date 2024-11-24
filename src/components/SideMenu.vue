@@ -30,15 +30,39 @@
         </v-badge>
       </template>
     </v-list-item>
+    <v-spacer></v-spacer>
+    <v-list-item base-color="red" @click="openDialog">
+      <template #prepend>
+        <v-icon :icon="mdiTrashCan"></v-icon>
+      </template>
+
+      <v-list-item-title>Clear item</v-list-item-title>
+    </v-list-item>
   </v-list>
 
   <TaskForm v-model="showTaskForm" variant="dialog" />
+
+  <v-dialog v-model="dialog" max-width="500px" transition="dialog-transition">
+    <v-card>
+      <v-card-text>
+        <h3>{{ warningMessage }}</h3>
+      </v-card-text>
+      <v-card-actions>
+        <v-spacer></v-spacer>
+        <v-btn variant="text" @click="closeDialog"> cancel </v-btn>
+        <v-btn @click="clearStorage"> clear </v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
 </template>
 <script setup>
-import { computed, ref } from 'vue'
+import { computed } from 'vue'
 import { useRouter } from 'vue-router'
-import { mdiPlusCircle } from '@mdi/js'
+import { storeToRefs } from 'pinia'
+import { mdiPlusCircle, mdiTrashCan } from '@mdi/js'
 import { useTaskStore } from '@/stores/useTaskStore'
+import { useTaskForm } from '@/composables/useTaskForm'
+import { useClearStorage } from '@/composables/useClearStorage'
 import TaskForm from './TaskForm.vue'
 import {
   ROUTE_NAME_TODAY,
@@ -46,37 +70,27 @@ import {
   ROUTE_NAME_FINISHED,
 } from '@/constants'
 
+const taskStore = useTaskStore()
+const { getTasksOverdue, getTasksToday, getTasksUpcoming, getTasksCompleted } =
+  storeToRefs(taskStore)
+const { showTaskForm, openTaskForm } = useTaskForm()
+const { dialog, warningMessage, openDialog, closeDialog, clearStorage } =
+  useClearStorage()
+
+// route logic
 const routes = computed(() => {
   return useRouter().getRoutes()
 })
 
-// TaskForm logic
-const showTaskForm = ref(false)
-const openTaskForm = () => {
-  showTaskForm.value = true
-}
-
 // sidemenu logic
-const taskStore = useTaskStore()
-
-const amountTasksTodayAndOverdue = computed(() => {
-  return taskStore.getTasksOverdue().length + taskStore.getTasksToday().length
-})
-const amountTasksUpcoming = computed(() => {
-  return taskStore.getTasksUpcoming().length
-})
-const amountTasksCompleted = computed(() => {
-  return taskStore.getTasksCompleted().length
-})
-
 const getAmount = (routeName) => {
   switch (routeName) {
     case ROUTE_NAME_TODAY:
-      return amountTasksTodayAndOverdue.value
+      return getTasksOverdue.length + getTasksToday.length
     case ROUTE_NAME_UPCOMING:
-      return amountTasksUpcoming.value
+      return getTasksUpcoming.length
     case ROUTE_NAME_FINISHED:
-      return amountTasksCompleted.value
+      return getTasksCompleted.length
   }
 }
 const getProps = (routeName) => {

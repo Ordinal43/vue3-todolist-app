@@ -36,5 +36,10 @@ export const router = createRouter({
         title: 'Finished tasks',
       },
     },
+    {
+      path: '/:pathMatch(.*)*',
+      name: 'NotFound',
+      component: () => import('@/views/NotFound.vue'),
+    },
   ],
 })

@@ -44,7 +44,7 @@
                   size="small"
                   v-bind="props"
                 >
-                  {{ formattedDate }}
+                  {{ formatDate(form.taskDate.val) }}
                 </v-btn>
               </template>
 
@@ -64,7 +64,7 @@
               <template v-slot:activator="{ props }">
                 <v-btn
                   :prepend-icon="mdiFlag"
-                  :color="getPriorityColor"
+                  :color="getPriorityColor(form.taskPriority.val)"
                   variant="outlined"
                   size="small"
                   v-bind="props"
@@ -127,11 +127,19 @@ import {
   useTemplateRef,
   watchEffect,
 } from 'vue'
-import { useDate } from 'vuetify'
 import { VDialog } from 'vuetify/components/VDialog'
 import { mdiCalendar, mdiClose, mdiFlag } from '@mdi/js'
-import { useFormRules } from '@/composables/useFormRules'
 import { useTaskStore } from '@/stores/useTaskStore'
+import { useFormRules } from '@/composables/useFormRules'
+import { useDatePicker } from '@/composables/useDatePicker'
+import { useTaskPriority } from '@/composables/useTaskPriority'
+
+const taskStore = useTaskStore()
+const { ruleRequired, ruleMaxLen } = useFormRules()
+const { currentDate, minDate, menuDatePicker, formatDate, setDateAndClose } =
+  useDatePicker()
+const { menuPriority, priorityOptions, getPriorityColor, setPriorityAndClose } =
+  useTaskPriority()
 
 // dialog logic
 const showForm = defineModel()
@@ -175,49 +183,20 @@ const getVariant = computed(() => {
 })
 
 // menu date-picker logic
-const dateAdapter = useDate()
-const menuDatePicker = ref(false)
-const formattedDate = computed(() =>
-  dateAdapter.format(form.value.taskDate.val, 'normalDateWithWeekday'),
-)
 const setTaskDate = (event) => {
-  form.value.taskDate.val = event
-  menuDatePicker.value = false
+  setDateAndClose(() => {
+    form.value.taskDate.val = event
+  })
 }
 
 // menu priority logic
-const menuPriority = ref(false)
-const priorityOptions = [
-  { value: 1, color: 'red' },
-  { value: 2, color: 'yellow' },
-  { value: 3, color: 'blue' },
-  { value: 4, color: 'grey' },
-]
 const setTaskPriority = (priority) => {
-  form.value.taskPriority.val = priority
-  menuPriority.value = false
+  setPriorityAndClose(() => {
+    form.value.taskPriority.val = priority
+  })
 }
-const getPriorityColor = computed(() => {
-  switch (form.value.taskPriority.val) {
-    case 1:
-      return 'red'
-    case 2:
-      return 'yellow'
-    case 3:
-      return 'blue'
-    default:
-      return 'grey'
-  }
-})
 
 // input logic
-const { ruleRequired, ruleMaxLen } = useFormRules()
-
-const currentDate = new Date()
-currentDate.setHours(0, 0, 0, 0)
-
-const minDate = ref(currentDate)
-
 const getInitialData = () => ({
   taskName: {
     val: '',
@@ -253,7 +232,6 @@ watchEffect(async () => {
 })
 
 const isFormValid = ref()
-const taskStore = useTaskStore()
 const isSubtaskForm = inject('isSubtaskForm', false)
 
 const submitForm = () => {

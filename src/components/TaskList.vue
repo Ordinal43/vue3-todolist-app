@@ -77,7 +77,6 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
 import { useDate } from 'vuetify'
 import {
   mdiCalendarClock,
@@ -86,10 +85,16 @@ import {
   mdiTrashCan,
 } from '@mdi/js'
 import { useTaskStore } from '@/stores/useTaskStore'
+import { useCustomDate } from '@/composables/useCustomDate'
+import { useTaskPriority } from '@/composables/useTaskPriority'
+import { useTaskForm } from '@/composables/useTaskForm'
 import TaskForm from './TaskForm.vue'
 
 const dateAdapter = useDate()
 const taskStore = useTaskStore()
+const { todayMidnight } = useCustomDate()
+const { getPriorityColor } = useTaskPriority()
+const { showTaskForm, openTaskForm } = useTaskForm()
 
 defineProps({
   tasks: {
@@ -102,11 +107,7 @@ defineProps({
   },
 })
 
-// tasks logic
-const TODAY = new Date()
-TODAY.setHours(0, 0, 0, 0)
-
-const getOverdue = (date) => dateAdapter.isBefore(new Date(date), TODAY)
+const getOverdue = (date) => dateAdapter.isBefore(new Date(date), todayMidnight)
 const getDueDateColor = (date) => {
   return getOverdue(date) ? 'red' : null
 }
@@ -122,28 +123,8 @@ const deleteTask = async (key, parentKey) => {
   await taskStore.deleteTask(key, parentKey)
 }
 
-// TaskForm logic
-const showTaskForm = ref(false)
-const openTaskForm = () => {
-  showTaskForm.value = true
-}
-
 // show task logic
 const openTaskDetail = (key) => {
   taskStore.setActiveKey(key)
-}
-
-// priority logic
-const getPriorityColor = (value) => {
-  switch (value) {
-    case 1:
-      return 'red'
-    case 2:
-      return 'yellow'
-    case 3:
-      return 'blue'
-    default:
-      return 'grey'
-  }
 }
 </script>

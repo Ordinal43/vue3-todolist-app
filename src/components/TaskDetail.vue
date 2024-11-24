@@ -174,7 +174,7 @@
                     block
                     v-bind="props"
                   >
-                    {{ formattedDate }}
+                    {{ formatDate(getTaskDetails.date) }}
                   </v-btn>
                 </template>
 
@@ -245,7 +245,6 @@ import {
   useTemplateRef,
   watchEffect,
 } from 'vue'
-import { useDate } from 'vuetify'
 import {
   mdiCalendar,
   mdiCheck,
@@ -256,10 +255,15 @@ import {
 } from '@mdi/js'
 import { useFormRules } from '@/composables/useFormRules'
 import { useTaskStore } from '@/stores/useTaskStore'
+import { useDatePicker } from '@/composables/useDatePicker'
+import { useTaskPriority } from '@/composables/useTaskPriority'
 import TaskList from './TaskList.vue'
 import TaskDetailMenu from './TaskDetailMenu.vue'
 
 const taskStore = useTaskStore()
+const { minDate, menuDatePicker, formatDate, setDateAndClose } = useDatePicker()
+const { menuPriority, priorityOptions, getPriorityColor, setPriorityAndClose } =
+  useTaskPriority()
 
 // dialog logic
 const showTaskDetail = computed(() => {
@@ -369,42 +373,15 @@ const submitForm = () => {
 }
 
 // date-picker logic
-const dateAdapter = useDate()
-const currentDate = new Date()
-currentDate.setHours(0, 0, 0, 0)
-const minDate = ref(currentDate)
-
-const menuDatePicker = ref(false)
-const formattedDate = computed(() =>
-  dateAdapter.format(getTaskDetails.value.date, 'normalDateWithWeekday'),
-)
 const setTaskDate = (event) => {
-  taskStore.updateTaskDate(taskStore.activeKey, event)
-  menuDatePicker.value = false
+  setDateAndClose(() => {
+    taskStore.updateTaskDate(taskStore.activeKey, event)
+  })
 }
 
-// menu priority logic
-const menuPriority = ref(false)
-const priorityOptions = [
-  { value: 1, color: 'red' },
-  { value: 2, color: 'yellow' },
-  { value: 3, color: 'blue' },
-  { value: 4, color: 'grey' },
-]
-const getPriorityColor = (value) => {
-  switch (value) {
-    case 1:
-      return 'red'
-    case 2:
-      return 'yellow'
-    case 3:
-      return 'blue'
-    default:
-      return 'grey'
-  }
-}
 const setTaskPriority = (priority) => {
-  taskStore.updateTaskPriority(taskStore.activeKey, priority)
-  menuPriority.value = false
+  setPriorityAndClose(() => {
+    taskStore.updateTaskPriority(taskStore.activeKey, priority)
+  })
 }
 </script>
