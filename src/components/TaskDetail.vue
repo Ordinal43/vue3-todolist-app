@@ -2,7 +2,7 @@
   <v-dialog
     :model-value="showTaskDetail"
     @update:model-value="closeForm"
-    max-width="800"
+    max-width="850"
     min-height="500"
   >
     <v-card v-if="getTaskDetails">
@@ -68,7 +68,8 @@
                   @update:model-value="
                     (value) => setTaskStatus(getTaskDetails.key, value)
                   "
-                  color="primary"
+                  :base-color="getPriorityColor(getTaskDetails.priority)"
+                  :color="getPriorityColor(getTaskDetails.priority)"
                   hide-details
                 ></v-checkbox>
               </v-col>
@@ -156,31 +157,77 @@
             </TaskList>
           </v-col>
 
-          <v-col cols="12" md="3" class="d-flex flex-column align-end">
-            <v-menu
-              v-model="menuDatePicker"
-              :close-on-content-click="false"
-              location="bottom"
-            >
-              <template v-slot:activator="{ props }">
-                <v-btn
-                  :prepend-icon="mdiCalendar"
-                  color="primary"
-                  variant="outlined"
-                  size="small"
-                  v-bind="props"
-                >
-                  {{ formattedDate }}
-                </v-btn>
-              </template>
+          <v-col cols="12" md="3" class="px-3">
+            <TaskDetailMenu>
+              <template #title> Due date </template>
+              <v-menu
+                v-model="menuDatePicker"
+                :close-on-content-click="false"
+                location="bottom"
+              >
+                <template v-slot:activator="{ props }">
+                  <v-btn
+                    :prepend-icon="mdiCalendar"
+                    color="primary"
+                    variant="text"
+                    size="small"
+                    block
+                    v-bind="props"
+                  >
+                    {{ formattedDate }}
+                  </v-btn>
+                </template>
 
-              <v-date-picker
-                :model-value="form.taskDate.val"
-                @update:model-value="setTaskDate"
-                :min="minDate"
-                hide-header
-              ></v-date-picker>
-            </v-menu>
+                <v-date-picker
+                  :model-value="form.taskDate.val"
+                  @update:model-value="setTaskDate"
+                  :min="minDate"
+                  hide-header
+                ></v-date-picker>
+              </v-menu>
+            </TaskDetailMenu>
+
+            <TaskDetailMenu>
+              <template #title> Priority </template>
+              <v-menu
+                v-model="menuPriority"
+                :close-on-content-click="false"
+                location="bottom"
+              >
+                <template v-slot:activator="{ props }">
+                  <v-btn
+                    :prepend-icon="mdiFlag"
+                    :color="getPriorityColor(form.taskPriority.val)"
+                    variant="text"
+                    size="small"
+                    v-bind="props"
+                    block
+                  >
+                    {{
+                      form.taskPriority.val < 4
+                        ? `P${form.taskPriority.val}`
+                        : 'Priority'
+                    }}
+                  </v-btn>
+                </template>
+
+                <v-list>
+                  <v-list-item
+                    v-for="(item, i) in priorityOptions"
+                    :key="`prio-${i}`"
+                    :base-color="item.color"
+                    @click="setTaskPriority(item.value)"
+                  >
+                    <template #prepend>
+                      <v-icon :icon="mdiFlag"></v-icon>
+                    </template>
+                    <v-list-item-title
+                      >Priority {{ item.value }}</v-list-item-title
+                    >
+                  </v-list-item>
+                </v-list>
+              </v-menu>
+            </TaskDetailMenu>
           </v-col>
         </v-row>
       </v-card-text>
@@ -205,10 +252,12 @@ import {
   mdiChevronRight,
   mdiClose,
   mdiFileTree,
+  mdiFlag,
 } from '@mdi/js'
 import { useFormRules } from '@/composables/useFormRules'
 import { useTaskStore } from '@/stores/useTaskStore'
 import TaskList from './TaskList.vue'
+import TaskDetailMenu from './TaskDetailMenu.vue'
 
 const taskStore = useTaskStore()
 
@@ -266,6 +315,9 @@ const getInitialData = () => ({
   taskDate: {
     val: '',
   },
+  taskPriority: {
+    val: 4,
+  },
 })
 
 // form logic
@@ -284,11 +336,12 @@ const closeEditForm = () => {
 }
 
 const resetForm = () => {
-  const { name, desc, date } = getTaskDetails.value
+  const { name, desc, date, priority } = getTaskDetails.value
 
   form.value.taskName.val = name
   form.value.taskDesc.val = desc
   form.value.taskDate.val = new Date(date)
+  form.value.taskPriority.val = priority
 }
 
 watchEffect(() => {
@@ -328,5 +381,30 @@ const formattedDate = computed(() =>
 const setTaskDate = (event) => {
   taskStore.updateTaskDate(taskStore.activeKey, event)
   menuDatePicker.value = false
+}
+
+// menu priority logic
+const menuPriority = ref(false)
+const priorityOptions = [
+  { value: 1, color: 'red' },
+  { value: 2, color: 'yellow' },
+  { value: 3, color: 'blue' },
+  { value: 4, color: 'grey' },
+]
+const getPriorityColor = (value) => {
+  switch (value) {
+    case 1:
+      return 'red'
+    case 2:
+      return 'yellow'
+    case 3:
+      return 'blue'
+    default:
+      return 'grey'
+  }
+}
+const setTaskPriority = (priority) => {
+  taskStore.updateTaskPriority(taskStore.activeKey, priority)
+  menuPriority.value = false
 }
 </script>

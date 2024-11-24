@@ -10,7 +10,7 @@
       <v-row
         v-for="task in tasks"
         :key="task.key"
-        class="align-center"
+        class="mt-3 align-center"
         no-gutters
         cols="12"
       >
@@ -18,7 +18,8 @@
           <v-checkbox
             :model-value="task.isCompleted"
             @update:model-value="(value) => setTaskStatus(task.key, value)"
-            color="primary"
+            :base-color="getPriorityColor(task.priority)"
+            :color="getPriorityColor(task.priority)"
             hide-details
           ></v-checkbox>
         </v-col>
@@ -27,9 +28,24 @@
             <h5 :class="getTaskStyle(task.isCompleted)">
               {{ task.name }}
             </h5>
-            <p :class="getDueDateColor(task.date)">
-              {{ dateAdapter.format(task.date, 'shortDate') }}
-            </p>
+            <div class="d-flex ga-2">
+              <v-chip
+                v-if="task.childKeys.length"
+                :prepend-icon="mdiFileTree"
+                density="comfortable"
+                size="small"
+              >
+                {{ task.childKeys.length }}
+              </v-chip>
+              <v-chip
+                :prepend-icon="mdiCalendarClock"
+                :color="getDueDateColor(task.date)"
+                size="small"
+                density="comfortable"
+              >
+                {{ dateAdapter.format(task.date, 'shortDate') }}
+              </v-chip>
+            </div>
           </v-card>
         </v-col>
         <v-col cols="1">
@@ -63,7 +79,12 @@
 <script setup>
 import { ref } from 'vue'
 import { useDate } from 'vuetify'
-import { mdiPlusCircle, mdiTrashCan } from '@mdi/js'
+import {
+  mdiCalendarClock,
+  mdiFileTree,
+  mdiPlusCircle,
+  mdiTrashCan,
+} from '@mdi/js'
 import { useTaskStore } from '@/stores/useTaskStore'
 import TaskForm from './TaskForm.vue'
 
@@ -87,7 +108,7 @@ TODAY.setHours(0, 0, 0, 0)
 
 const getOverdue = (date) => dateAdapter.isBefore(new Date(date), TODAY)
 const getDueDateColor = (date) => {
-  return getOverdue(date) ? { 'text-red': true } : null
+  return getOverdue(date) ? 'red' : null
 }
 const getTaskStyle = (isCompleted) => {
   return isCompleted ? { 'text-decoration-line-through': true } : null
@@ -110,5 +131,19 @@ const openTaskForm = () => {
 // show task logic
 const openTaskDetail = (key) => {
   taskStore.setActiveKey(key)
+}
+
+// priority logic
+const getPriorityColor = (value) => {
+  switch (value) {
+    case 1:
+      return 'red'
+    case 2:
+      return 'yellow'
+    case 3:
+      return 'blue'
+    default:
+      return 'grey'
+  }
 }
 </script>
