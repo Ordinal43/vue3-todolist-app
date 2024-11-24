@@ -5,7 +5,49 @@
     maxWidth="800"
   >
     <v-card v-if="getTaskDetails">
-      <v-card-title class="d-flex align-center">
+      <v-card-title class="d-flex mt-2 align-center">
+        <template v-if="getParentTask !== null">
+          <v-btn-group density="compact" variant="outlined" divided>
+            <v-btn
+              @click="openTaskDetail(getTaskDetails.parentKey)"
+              size="x-small"
+            >
+              {{ getParentTask.name }}
+            </v-btn>
+            <v-menu
+              v-model="menuSiblingTask"
+              :close-on-content-click="false"
+              location="bottom"
+            >
+              <template v-slot:activator="{ props }">
+                <v-btn
+                  :prepend-icon="mdiFileTree"
+                  :append-icon="mdiChevronRight"
+                  size="x-small"
+                  v-bind="props"
+                >
+                  {{ getSiblingTasks.length }}
+                </v-btn>
+              </template>
+
+              <v-list rounded variant="tonal">
+                <v-list-item
+                  v-for="(item, i) in getSiblingTasks"
+                  :key="`sibling-${i}`"
+                  @click="openTaskDetail(item.key)"
+                >
+                  <v-list-item-title>{{ item.name }}</v-list-item-title>
+                  <template #append>
+                    <v-icon
+                      v-if="item.key === getTaskDetails.key"
+                      :icon="mdiCheck"
+                    ></v-icon>
+                  </template>
+                </v-list-item>
+              </v-list>
+            </v-menu>
+          </v-btn-group>
+        </template>
         <v-spacer></v-spacer>
         <v-btn
           @click="closeForm"
@@ -51,6 +93,7 @@
               <p v-if="getTaskDetails.desc">{{ getTaskDetails.desc }}</p>
               <p v-else class="text-grey">No Description...</p>
             </div>
+            <div class="my-5"></div>
             <TaskList
               v-if="getTaskDetails.level < 5"
               :tasks="getSubtasks"
@@ -111,7 +154,13 @@ import {
   watchEffect,
 } from 'vue'
 import { useDate } from 'vuetify'
-import { mdiCalendar, mdiClose } from '@mdi/js'
+import {
+  mdiCalendar,
+  mdiCheck,
+  mdiChevronRight,
+  mdiClose,
+  mdiFileTree,
+} from '@mdi/js'
 import { useFormRules } from '@/composables/useFormRules'
 import { useTaskStore } from '@/stores/useTaskStore'
 import TaskList from './TaskList.vue'
@@ -125,12 +174,31 @@ const showTaskDetail = computed(() => {
 const closeForm = () => {
   taskStore.setShowTaskDetail(false)
 }
-
 const getTaskDetails = computed(() => {
   return taskStore.tasks.get(taskStore.activeKey)
 })
-// provide for TaskForm
+
+// parent task logic
+const getParentTask = computed(() => {
+  const parentKey = getTaskDetails.value.parentKey
+  if (parentKey === null) return null
+  return taskStore.tasks.get(parentKey)
+})
+const getSiblingTasks = computed(() => {
+  return taskStore.getSubtasks(getTaskDetails.value.parentKey)
+})
+const openTaskDetail = (key) => {
+  menuSiblingTask.value = false
+  taskStore.setActiveKey(key)
+}
+
+const menuSiblingTask = ref(false)
+
+// subtasks store logic
 provide('isSubtaskForm', true)
+const getSubtasks = computed(() => {
+  return taskStore.getSubtasks(taskStore.activeKey)
+})
 
 // input logic
 const { ruleRequired, ruleMaxLen } = useFormRules()
@@ -211,9 +279,4 @@ const setTaskDate = (event) => {
   taskStore.updateTaskDate(taskStore.activeKey, event)
   menuDatePicker.value = false
 }
-
-// subtasks store logic
-const getSubtasks = computed(() => {
-  return taskStore.getSubtasks(taskStore.activeKey)
-})
 </script>

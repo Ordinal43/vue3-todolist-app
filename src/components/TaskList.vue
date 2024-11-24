@@ -1,10 +1,12 @@
 <template>
   <v-card variant="flat">
-    <v-card-title v-if="$slots.header">
-      <slot name="header" />
-    </v-card-title>
-    <v-divider></v-divider>
-    <v-container v-if="tasks.length">
+    <v-container>
+      <div v-if="$slots.header" class="mb-3">
+        <h4>
+          <slot name="header" />
+        </h4>
+      </div>
+      <v-divider></v-divider>
       <v-row
         v-for="task in tasks"
         :key="task.key"
@@ -22,9 +24,9 @@
         </v-col>
         <v-col>
           <v-card @click="openTaskDetail(task.key)" class="pa-2" variant="text">
-            <h3 :class="getTaskStyle(task.isCompleted)">
+            <h5 :class="getTaskStyle(task.isCompleted)">
               {{ task.name }}
-            </h3>
+            </h5>
             <p :class="getDueDateColor(task.date)">
               {{ dateAdapter.format(task.date, 'shortDate') }}
             </p>
@@ -43,6 +45,7 @@
     </v-container>
     <v-card-text
       v-if="hasAction"
+      class="pt-0"
       :class="{
         'pb-0': showTaskForm,
       }"
