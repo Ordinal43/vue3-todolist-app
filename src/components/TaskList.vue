@@ -1,10 +1,12 @@
 <template>
   <v-card variant="flat">
-    <v-card-title v-if="$slots.header">
-      <slot name="header" />
-    </v-card-title>
-    <v-divider></v-divider>
-    <v-container v-if="tasks.length">
+    <v-container>
+      <div v-if="$slots.header" class="mb-3">
+        <h4>
+          <slot name="header" />
+        </h4>
+      </div>
+      <v-divider></v-divider>
       <v-row
         v-for="task in tasks"
         :key="task.key"
@@ -15,16 +17,16 @@
         <v-col cols="1">
           <v-checkbox
             :model-value="task.isCompleted"
-            @update:model-value="(value) => completeTask(task.key, value)"
-            color="red"
+            @update:model-value="(value) => setTaskStatus(task.key, value)"
+            color="primary"
             hide-details
           ></v-checkbox>
         </v-col>
         <v-col>
           <v-card @click="openTaskDetail(task.key)" class="pa-2" variant="text">
-            <h3 :class="getTaskStyle(task.isCompleted)">
+            <h5 :class="getTaskStyle(task.isCompleted)">
               {{ task.name }}
-            </h3>
+            </h5>
             <p :class="getDueDateColor(task.date)">
               {{ dateAdapter.format(task.date, 'shortDate') }}
             </p>
@@ -41,12 +43,7 @@
         </v-col>
       </v-row>
     </v-container>
-    <v-card-text
-      v-if="hasAction"
-      :class="{
-        'pb-0': showTaskForm,
-      }"
-    >
+    <v-card-text v-if="hasAction" class="pt-0">
       <div v-if="!showTaskForm">
         <v-btn
           @click="openTaskForm"
@@ -96,12 +93,12 @@ const getTaskStyle = (isCompleted) => {
   return isCompleted ? { 'text-decoration-line-through': true } : null
 }
 
-const completeTask = (key, value) => {
-  taskStore.setTaskComplete(key, value)
+const setTaskStatus = async (key, value) => {
+  await taskStore.setTaskStatus(key, value)
 }
 
-const deleteTask = (key, parentKey) => {
-  taskStore.deleteTask(key, parentKey)
+const deleteTask = async (key, parentKey) => {
+  await taskStore.deleteTask(key, parentKey)
 }
 
 // TaskForm logic

@@ -1,6 +1,6 @@
 <template>
   <component :is="getComponent" v-bind="getComponentProps">
-    <v-card v-show="showForm" variant="flat">
+    <v-card v-show="showForm" :variant="getVariant" rounded>
       <v-form
         ref="form-task"
         v-model="isFormValid"
@@ -11,48 +11,55 @@
             ref="input-task-name"
             v-model="form.taskName.val"
             :rules="form.taskName.rules"
-            :label="form.taskName.label"
+            :placeholder="form.taskName.label"
             single-line
-            variant="outlined"
-            class="my-2"
+            hide-details
+            density="compact"
+            variant="plain"
           ></v-text-field>
 
           <v-textarea
             v-model="form.taskDesc.val"
             :rules="form.taskDesc.rules"
-            :label="form.taskDesc.label"
+            :placeholder="form.taskDesc.label"
             single-line
+            hide-details
             no-resize
             auto-grow
             rows="1"
-            variant="outlined"
-            class="my-2"
+            density="compact"
+            variant="plain"
           ></v-textarea>
 
-          <v-menu
-            v-model="menuDatePicker"
-            :close-on-content-click="false"
-            location="bottom"
-          >
-            <template v-slot:activator="{ props }">
-              <v-btn
-                :prepend-icon="mdiCalendar"
-                color="primary"
-                variant="outlined"
-                v-bind="props"
-              >
-                {{ formattedDate }}
-              </v-btn>
-            </template>
+          <div class="mt-5">
+            <v-menu
+              v-model="menuDatePicker"
+              :close-on-content-click="false"
+              location="bottom"
+            >
+              <template v-slot:activator="{ props }">
+                <v-btn
+                  :prepend-icon="mdiCalendar"
+                  color="primary"
+                  variant="outlined"
+                  size="small"
+                  v-bind="props"
+                >
+                  {{ formattedDate }}
+                </v-btn>
+              </template>
 
-            <v-date-picker
-              :model-value="form.taskDate.val"
-              @update:model-value="setTaskDate"
-              :min="minDate"
-              hide-header
-            ></v-date-picker>
-          </v-menu>
+              <v-date-picker
+                :model-value="form.taskDate.val"
+                @update:model-value="setTaskDate"
+                :min="minDate"
+                hide-header
+              ></v-date-picker>
+            </v-menu>
+          </div>
         </v-card-text>
+
+        <v-divider></v-divider>
 
         <v-card-actions>
           <v-spacer></v-spacer>
@@ -121,6 +128,14 @@ const getComponentProps = computed(() => {
       }
     default:
       return {}
+  }
+})
+const getVariant = computed(() => {
+  switch (props.variant) {
+    case VARIANT_DIALOG:
+      return 'flat'
+    default:
+      return 'outlined'
   }
 })
 

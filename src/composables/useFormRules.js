@@ -5,7 +5,7 @@ export const useFormRules = () => {
   }
 
   const ruleMaxLen = (value, maxLen) => {
-    if (value?.length <= maxLen) return true
+    if ((value || '').length <= maxLen) return true
     return `Field is maximum ${maxLen} characters.`
   }
 
