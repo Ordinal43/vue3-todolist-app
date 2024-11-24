@@ -10,6 +10,10 @@ export const useTaskStore = defineStore('task', () => {
   // task CRUD logic
   const tasks = useLocalStorage(LOCAL_STORAGE_KEY, new Map())
 
+  const clearStorage = () => {
+    tasks.value = new Map()
+  }
+
   const addNewTask = (parentKey, level = 0, { name, desc, date, priority }) => {
     const newId = uuidv4()
 
@@ -141,6 +145,7 @@ export const useTaskStore = defineStore('task', () => {
 
   return {
     tasks,
+    clearStorage,
     addNewTask,
     deleteTask,
     setTaskStatus,

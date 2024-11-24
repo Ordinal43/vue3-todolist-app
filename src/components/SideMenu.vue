@@ -30,14 +30,35 @@
         </v-badge>
       </template>
     </v-list-item>
+    <v-spacer></v-spacer>
+    <v-list-item base-color="red" @click="openDialog">
+      <template #prepend>
+        <v-icon :icon="mdiTrashCan"></v-icon>
+      </template>
+
+      <v-list-item-title>Clear item</v-list-item-title>
+    </v-list-item>
   </v-list>
 
   <TaskForm v-model="showTaskForm" variant="dialog" />
+
+  <v-dialog v-model="dialog" max-width="500px" transition="dialog-transition">
+    <v-card>
+      <v-card-text>
+        <h3>{{ warningMessage }}</h3>
+      </v-card-text>
+      <v-card-actions>
+        <v-spacer></v-spacer>
+        <v-btn variant="text" @click="closeDialog"> cancel </v-btn>
+        <v-btn @click="clearStorage"> clear </v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
 </template>
 <script setup>
 import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { mdiPlusCircle } from '@mdi/js'
+import { mdiPlusCircle, mdiTrashCan } from '@mdi/js'
 import { useTaskStore } from '@/stores/useTaskStore'
 import TaskForm from './TaskForm.vue'
 import {
@@ -45,6 +66,7 @@ import {
   ROUTE_NAME_UPCOMING,
   ROUTE_NAME_FINISHED,
 } from '@/constants'
+import { useClearStorage } from '@/composables/useClearStorage'
 
 const routes = computed(() => {
   return useRouter().getRoutes()
@@ -95,4 +117,8 @@ const getProps = (routeName) => {
       }
   }
 }
+
+// clear storage composable
+const { dialog, warningMessage, openDialog, closeDialog, clearStorage } =
+  useClearStorage()
 </script>
