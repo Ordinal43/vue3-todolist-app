@@ -44,7 +44,7 @@
                   size="small"
                   v-bind="props"
                 >
-                  {{ formattedDate }}
+                  {{ formatDate(form.taskDate.val) }}
                 </v-btn>
               </template>
 
@@ -127,11 +127,15 @@ import {
   useTemplateRef,
   watchEffect,
 } from 'vue'
-import { useDate } from 'vuetify'
 import { VDialog } from 'vuetify/components/VDialog'
 import { mdiCalendar, mdiClose, mdiFlag } from '@mdi/js'
 import { useFormRules } from '@/composables/useFormRules'
 import { useTaskStore } from '@/stores/useTaskStore'
+import { useDatePicker } from '@/composables/useDatePicker'
+
+const taskStore = useTaskStore()
+const { currentDate, minDate, menuDatePicker, formatDate, setDateAndClose } =
+  useDatePicker()
 
 // dialog logic
 const showForm = defineModel()
@@ -175,14 +179,10 @@ const getVariant = computed(() => {
 })
 
 // menu date-picker logic
-const dateAdapter = useDate()
-const menuDatePicker = ref(false)
-const formattedDate = computed(() =>
-  dateAdapter.format(form.value.taskDate.val, 'normalDateWithWeekday'),
-)
 const setTaskDate = (event) => {
-  form.value.taskDate.val = event
-  menuDatePicker.value = false
+  setDateAndClose(() => {
+    form.value.taskDate.val = event
+  })
 }
 
 // menu priority logic
@@ -212,11 +212,6 @@ const getPriorityColor = computed(() => {
 
 // input logic
 const { ruleRequired, ruleMaxLen } = useFormRules()
-
-const currentDate = new Date()
-currentDate.setHours(0, 0, 0, 0)
-
-const minDate = ref(currentDate)
 
 const getInitialData = () => ({
   taskName: {
@@ -253,7 +248,6 @@ watchEffect(async () => {
 })
 
 const isFormValid = ref()
-const taskStore = useTaskStore()
 const isSubtaskForm = inject('isSubtaskForm', false)
 
 const submitForm = () => {

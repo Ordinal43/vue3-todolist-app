@@ -174,7 +174,7 @@
                     block
                     v-bind="props"
                   >
-                    {{ formattedDate }}
+                    {{ formatDate(getTaskDetails.date) }}
                   </v-btn>
                 </template>
 
@@ -245,7 +245,6 @@ import {
   useTemplateRef,
   watchEffect,
 } from 'vue'
-import { useDate } from 'vuetify'
 import {
   mdiCalendar,
   mdiCheck,
@@ -256,10 +255,12 @@ import {
 } from '@mdi/js'
 import { useFormRules } from '@/composables/useFormRules'
 import { useTaskStore } from '@/stores/useTaskStore'
+import { useDatePicker } from '@/composables/useDatePicker'
 import TaskList from './TaskList.vue'
 import TaskDetailMenu from './TaskDetailMenu.vue'
 
 const taskStore = useTaskStore()
+const { minDate, menuDatePicker, formatDate, setDateAndClose } = useDatePicker()
 
 // dialog logic
 const showTaskDetail = computed(() => {
@@ -369,18 +370,10 @@ const submitForm = () => {
 }
 
 // date-picker logic
-const dateAdapter = useDate()
-const currentDate = new Date()
-currentDate.setHours(0, 0, 0, 0)
-const minDate = ref(currentDate)
-
-const menuDatePicker = ref(false)
-const formattedDate = computed(() =>
-  dateAdapter.format(getTaskDetails.value.date, 'normalDateWithWeekday'),
-)
 const setTaskDate = (event) => {
-  taskStore.updateTaskDate(taskStore.activeKey, event)
-  menuDatePicker.value = false
+  setDateAndClose(() => {
+    taskStore.updateTaskDate(taskStore.activeKey, event)
+  })
 }
 
 // menu priority logic
