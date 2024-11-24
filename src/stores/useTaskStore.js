@@ -29,18 +29,37 @@ export const useTaskStore = defineStore('task', () => {
     }
   }
 
-  const deleteTask = (key, parentKey) => {
+  const deleteTask = async (key, parentKey) => {
+    // delete all subtasks
+    const task = tasks.value.get(key)
+    if (!task) return
+
+    const childPromises = task.childKeys.map((childKey) => {
+      return deleteTask(childKey, key)
+    })
+
+    // delete current
     tasks.value.delete(key)
+
     if (parentKey) {
       const parentTask = tasks.value.get(parentKey)
       parentTask.childKeys = parentTask.childKeys.filter((childKey) => {
         return childKey !== key
       })
     }
+
+    return Promise.all(childPromises)
   }
 
-  const setTaskComplete = (key, isCompleted) => {
-    tasks.value.get(key).isCompleted = isCompleted
+  const setTaskStatus = async (key, isCompleted) => {
+    const task = tasks.value.get(key)
+    if (!task) return
+    task.isCompleted = isCompleted
+
+    const childPromises = task.childKeys.map((childKey) => {
+      return setTaskStatus(childKey, isCompleted)
+    })
+    return Promise.all(childPromises)
   }
 
   const updateTaskValue = (key, { name, desc }) => {
@@ -97,12 +116,9 @@ export const useTaskStore = defineStore('task', () => {
     })
   }
   const getSubtasks = (key) => {
-    return tasks.value
-      .get(key)
-      .childKeys.map((key) => {
-        return tasks.value.get(key)
-      })
-      .filter((task) => !task.isCompleted)
+    return tasks.value.get(key).childKeys.map((key) => {
+      return tasks.value.get(key)
+    })
   }
 
   // active task logic
@@ -122,7 +138,7 @@ export const useTaskStore = defineStore('task', () => {
     tasks,
     addNewTask,
     deleteTask,
-    setTaskComplete,
+    setTaskStatus,
     updateTaskValue,
     updateTaskDate,
     getTasksToday,

@@ -17,8 +17,8 @@
         <v-col cols="1">
           <v-checkbox
             :model-value="task.isCompleted"
-            @update:model-value="(value) => completeTask(task.key, value)"
-            color="red"
+            @update:model-value="(value) => setTaskStatus(task.key, value)"
+            color="primary"
             hide-details
           ></v-checkbox>
         </v-col>
@@ -43,13 +43,7 @@
         </v-col>
       </v-row>
     </v-container>
-    <v-card-text
-      v-if="hasAction"
-      class="pt-0"
-      :class="{
-        'pb-0': showTaskForm,
-      }"
-    >
+    <v-card-text v-if="hasAction" class="pt-0">
       <div v-if="!showTaskForm">
         <v-btn
           @click="openTaskForm"
@@ -99,12 +93,12 @@ const getTaskStyle = (isCompleted) => {
   return isCompleted ? { 'text-decoration-line-through': true } : null
 }
 
-const completeTask = (key, value) => {
-  taskStore.setTaskComplete(key, value)
+const setTaskStatus = async (key, value) => {
+  await taskStore.setTaskStatus(key, value)
 }
 
-const deleteTask = (key, parentKey) => {
-  taskStore.deleteTask(key, parentKey)
+const deleteTask = async (key, parentKey) => {
+  await taskStore.deleteTask(key, parentKey)
 }
 
 // TaskForm logic

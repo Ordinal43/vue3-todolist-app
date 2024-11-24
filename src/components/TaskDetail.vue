@@ -2,7 +2,8 @@
   <v-dialog
     :model-value="showTaskDetail"
     @update:model-value="closeForm"
-    maxWidth="800"
+    max-width="800"
+    min-height="500"
   >
     <v-card v-if="getTaskDetails">
       <v-card-title class="d-flex mt-2 align-center">
@@ -60,39 +61,91 @@
       <v-card-text>
         <v-row no-gutters>
           <v-col cols="12" md="9">
-            <v-form
-              v-if="showEditForm"
-              ref="form-task"
-              v-model="isFormValid"
-              validate-on="lazy"
-              @submit.prevent=""
-            >
-              <v-text-field
-                ref="input-task-name"
-                v-model="form.taskName.val"
-                :rules="form.taskName.rules"
-                :label="form.taskName.label"
-                single-line
-                variant="outlined"
-              ></v-text-field>
+            <v-row no-gutters cols="12">
+              <v-col cols="1">
+                <v-checkbox
+                  :model-value="getTaskDetails.isCompleted"
+                  @update:model-value="
+                    (value) => setTaskStatus(getTaskDetails.key, value)
+                  "
+                  color="primary"
+                  hide-details
+                ></v-checkbox>
+              </v-col>
+              <v-col>
+                <v-form
+                  v-if="showEditForm"
+                  ref="form-task"
+                  v-model="isFormValid"
+                  @submit.prevent="submitForm"
+                >
+                  <v-card variant="outlined">
+                    <v-card-text class="pt-0">
+                      <v-text-field
+                        ref="input-task-name"
+                        v-model="form.taskName.val"
+                        :rules="form.taskName.rules"
+                        :placeholder="form.taskName.label"
+                        single-line
+                        hide-details
+                        density="compact"
+                        variant="plain"
+                      ></v-text-field>
 
-              <v-textarea
-                v-model="form.taskDesc.val"
-                :rules="form.taskDesc.rules"
-                :label="form.taskDesc.label"
-                single-line
-                no-resize
-                auto-grow
-                rows="1"
-                variant="outlined"
-              ></v-textarea>
-            </v-form>
-            <div v-else>
-              <h4>{{ getTaskDetails.name }}</h4>
-              <v-divider class="my-2"></v-divider>
-              <p v-if="getTaskDetails.desc">{{ getTaskDetails.desc }}</p>
-              <p v-else class="text-grey">No Description...</p>
-            </div>
+                      <v-textarea
+                        v-model="form.taskDesc.val"
+                        :rules="form.taskDesc.rules"
+                        :placeholder="form.taskDesc.label"
+                        single-line
+                        hide-details
+                        no-resize
+                        auto-grow
+                        rows="1"
+                        density="compact"
+                        variant="plain"
+                      ></v-textarea>
+                    </v-card-text>
+
+                    <v-card-actions>
+                      <v-spacer></v-spacer>
+                      <v-btn
+                        variant="text"
+                        size="small"
+                        class="ma-1"
+                        @click="closeEditForm"
+                        >Cancel</v-btn
+                      >
+                      <v-btn
+                        color="primary"
+                        size="small"
+                        class="ma-1"
+                        type="submit"
+                        >Save</v-btn
+                      >
+                    </v-card-actions>
+                  </v-card>
+                </v-form>
+                <div
+                  v-else
+                  @click="getTaskDetails.isCompleted ? null : openEditForm()"
+                >
+                  <h4
+                    :class="
+                      getTaskDetails.isCompleted
+                        ? { 'text-decoration-line-through': true }
+                        : null
+                    "
+                  >
+                    {{ getTaskDetails.name }}
+                  </h4>
+                  <template v-if="!getTaskDetails.isCompleted">
+                    <v-divider class="my-3"></v-divider>
+                    <p v-if="getTaskDetails.desc">{{ getTaskDetails.desc }}</p>
+                    <p v-else class="text-grey">No Description...</p>
+                  </template>
+                </div>
+              </v-col>
+            </v-row>
             <div class="my-5"></div>
             <TaskList
               v-if="getTaskDetails.level < 5"
@@ -102,6 +155,7 @@
               <template #header> Subtask </template>
             </TaskList>
           </v-col>
+
           <v-col cols="12" md="3" class="d-flex flex-column align-end">
             <v-menu
               v-model="menuDatePicker"
@@ -130,15 +184,6 @@
           </v-col>
         </v-row>
       </v-card-text>
-      <v-card-actions class="justify-start">
-        <v-btn v-if="!showEditForm" color="primary" @click="openEditForm">
-          Edit
-        </v-btn>
-        <template v-else>
-          <v-btn variant="text" @click="closeEditForm">Cancel</v-btn>
-          <v-btn color="primary" @click="submitForm">Save</v-btn>
-        </template>
-      </v-card-actions>
     </v-card>
   </v-dialog>
   <v-card> </v-card>
@@ -193,6 +238,11 @@ const openTaskDetail = (key) => {
 }
 
 const menuSiblingTask = ref(false)
+
+// current task logic
+const setTaskStatus = async (key, value) => {
+  await taskStore.setTaskStatus(key, value)
+}
 
 // subtasks store logic
 provide('isSubtaskForm', true)
