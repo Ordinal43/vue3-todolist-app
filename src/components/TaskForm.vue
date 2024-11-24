@@ -119,27 +119,22 @@
 </template>
 
 <script setup>
-import {
-  computed,
-  inject,
-  nextTick,
-  ref,
-  useTemplateRef,
-  watchEffect,
-} from 'vue'
+import { computed, inject, nextTick, ref, watchEffect } from 'vue'
 import { VDialog } from 'vuetify/components/VDialog'
 import { mdiCalendar, mdiClose, mdiFlag } from '@mdi/js'
 import { useTaskStore } from '@/stores/useTaskStore'
-import { useFormRules } from '@/composables/useFormRules'
+import { useDetailStore } from '@/stores/useDetailStore'
 import { useDatePicker } from '@/composables/useDatePicker'
 import { useTaskPriority } from '@/composables/useTaskPriority'
+import { useFormInputs } from '@/composables/useFormInputs'
 
 const taskStore = useTaskStore()
-const { ruleRequired, ruleMaxLen } = useFormRules()
-const { currentDate, minDate, menuDatePicker, formatDate, setDateAndClose } =
-  useDatePicker()
+const detailStore = useDetailStore()
+const { minDate, menuDatePicker, formatDate, setDateAndClose } = useDatePicker()
 const { menuPriority, priorityOptions, getPriorityColor, setPriorityAndClose } =
   useTaskPriority()
+const { form, isFormValid, formRef, inputTaskNameRef, resetForm } =
+  useFormInputs()
 
 // dialog logic
 const showForm = defineModel()
@@ -161,6 +156,7 @@ const getComponent = computed(() => {
       return 'div'
   }
 })
+
 const getComponentProps = computed(() => {
   switch (props.variant) {
     case VARIANT_DIALOG:
@@ -173,6 +169,7 @@ const getComponentProps = computed(() => {
       return {}
   }
 })
+
 const getVariant = computed(() => {
   switch (props.variant) {
     case VARIANT_DIALOG:
@@ -196,48 +193,22 @@ const setTaskPriority = (priority) => {
   })
 }
 
-// input logic
-const getInitialData = () => ({
-  taskName: {
-    val: '',
-    label: 'Task Name',
-    rules: [ruleRequired, (value) => ruleMaxLen(value, 150)],
-  },
-  taskDesc: {
-    val: '',
-    label: 'Task Description',
-    rules: [(value) => ruleMaxLen(value, 300)],
-  },
-  taskDate: {
-    val: currentDate,
-  },
-  taskPriority: {
-    val: 4,
-  },
-})
-
-const form = ref(getInitialData())
-
 // form logic
-const formEl = useTemplateRef('form-task')
-const inputTaskNameEl = useTemplateRef('input-task-name')
-
 watchEffect(async () => {
   if (showForm.value === true) {
-    form.value = getInitialData()
+    resetForm()
     await nextTick()
-    formEl.value.reset()
-    inputTaskNameEl.value.focus()
+    formRef.value.reset()
+    inputTaskNameRef.value.focus()
   }
 })
 
-const isFormValid = ref()
 const isSubtaskForm = inject('isSubtaskForm', false)
 
 const submitForm = () => {
   if (isFormValid.value === true) {
     const { taskName, taskDesc, taskDate, taskPriority } = form.value
-    const parentKey = isSubtaskForm ? taskStore.activeKey : null
+    const parentKey = isSubtaskForm ? detailStore.activeKey : null
     const parentLevel = taskStore.tasks.get(parentKey)?.level ?? 0
 
     taskStore.addNewTask(parentKey, parentLevel, {

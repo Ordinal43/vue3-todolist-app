@@ -19,7 +19,6 @@ export const useDatePicker = () => {
   }
 
   return {
-    currentDate: todayMidnight,
     minDate,
     menuDatePicker,
     formatDate,
