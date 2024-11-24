@@ -22,8 +22,8 @@
       <v-list-item-title>{{ item.meta.title }}</v-list-item-title>
       <template #append>
         <v-badge
-          v-show="getAmount(item.name) > 0 && item.name !== ROUTE_NAME_FINISHED"
-          :content="getAmount(item.name)"
+          v-show="getTaskCount(item.name) > 0"
+          :content="getTaskCount(item.name)"
           v-bind="getProps(item.name)"
           inline
         >
@@ -83,14 +83,14 @@ const routes = computed(() => {
 })
 
 // sidemenu logic
-const getAmount = (routeName) => {
+const getTaskCount = (routeName) => {
   switch (routeName) {
     case ROUTE_NAME_TODAY:
-      return getTasksOverdue.length + getTasksToday.length
+      return getTasksOverdue.value.length + getTasksToday.value.length
     case ROUTE_NAME_UPCOMING:
-      return getTasksUpcoming.length
+      return getTasksUpcoming.value.length
     case ROUTE_NAME_FINISHED:
-      return getTasksCompleted.length
+      return getTasksCompleted.value.length
   }
 }
 const getProps = (routeName) => {
@@ -106,6 +106,7 @@ const getProps = (routeName) => {
     case ROUTE_NAME_FINISHED:
       return {
         color: '',
+        variant: 'text',
       }
   }
 }
