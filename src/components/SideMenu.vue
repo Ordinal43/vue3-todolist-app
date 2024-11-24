@@ -36,7 +36,7 @@
         <v-icon :icon="mdiTrashCan"></v-icon>
       </template>
 
-      <v-list-item-title>Clear item</v-list-item-title>
+      <v-list-item-title>Clear localstorage</v-list-item-title>
     </v-list-item>
   </v-list>
 

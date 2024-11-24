@@ -30,7 +30,7 @@ export const router = createRouter({
     {
       path: '/finished',
       name: ROUTE_NAME_FINISHED,
-      component: () => import('@/views/FinishView.vue'),
+      component: () => import('@/views/CompletedView.vue'),
       meta: {
         icon: mdiCalendarCheck,
         title: 'Finished tasks',
