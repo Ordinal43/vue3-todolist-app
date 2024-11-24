@@ -15,11 +15,7 @@
             >
               {{ getParentTask.name }}
             </v-btn>
-            <v-menu
-              v-model="menuSiblingTask"
-              :close-on-content-click="false"
-              location="bottom"
-            >
+            <v-menu v-model="menuSiblingTask" location="bottom">
               <template v-slot:activator="{ props }">
                 <v-btn
                   :prepend-icon="mdiFileTree"
@@ -31,7 +27,7 @@
                 </v-btn>
               </template>
 
-              <v-list rounded variant="tonal">
+              <v-list rounded>
                 <v-list-item
                   v-for="(item, i) in getSiblingTasks"
                   :key="`sibling-${i}`"
@@ -257,6 +253,7 @@ import { useFormRules } from '@/composables/useFormRules'
 import { useTaskStore } from '@/stores/useTaskStore'
 import { useDatePicker } from '@/composables/useDatePicker'
 import { useTaskPriority } from '@/composables/useTaskPriority'
+import { useTaskDetailModal } from '@/composables/useTaskDetailModal'
 import TaskList from './TaskList.vue'
 import TaskDetailMenu from './TaskDetailMenu.vue'
 
@@ -264,6 +261,7 @@ const taskStore = useTaskStore()
 const { minDate, menuDatePicker, formatDate, setDateAndClose } = useDatePicker()
 const { menuPriority, priorityOptions, getPriorityColor, setPriorityAndClose } =
   useTaskPriority()
+const { openTaskDetail } = useTaskDetailModal()
 
 // dialog logic
 const showTaskDetail = computed(() => {
@@ -285,10 +283,6 @@ const getParentTask = computed(() => {
 const getSiblingTasks = computed(() => {
   return taskStore.getSubtasks(getTaskDetails.value.parentKey)
 })
-const openTaskDetail = (key) => {
-  menuSiblingTask.value = false
-  taskStore.setActiveKey(key)
-}
 
 const menuSiblingTask = ref(false)
 
