@@ -9,13 +9,13 @@
 </template>
 
 <script setup>
-import TaskList from '@/components/TaskList.vue'
-import { useTaskStore } from '@/stores/useTaskStore'
 import { computed } from 'vue'
+import { useTaskStore } from '@/stores/useTaskStore'
+import TaskList from '@/components/TaskList.vue'
 
 // task store logic
-const store = useTaskStore()
+const taskStore = useTaskStore()
 const getTasksCompleted = computed(() => {
-  return store.getTasksCompleted()
+  return taskStore.getTasksCompleted()
 })
 </script>

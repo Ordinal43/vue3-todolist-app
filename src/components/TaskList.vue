@@ -1,10 +1,10 @@
 <template>
-  <v-card>
+  <v-card variant="flat">
     <v-card-title v-if="$slots.header">
       <slot name="header" />
     </v-card-title>
     <v-divider></v-divider>
-    <v-container>
+    <v-container v-if="tasks.length">
       <v-row
         v-for="task in tasks"
         :key="task.key"
@@ -32,7 +32,7 @@
         </v-col>
         <v-col cols="1">
           <v-btn
-            @click="deleteTask(task.key)"
+            @click="deleteTask(task.key, task.parentKey)"
             :icon="mdiTrashCan"
             color="error"
             density="compact"
@@ -41,20 +41,34 @@
         </v-col>
       </v-row>
     </v-container>
-    <v-card-actions v-if="$slots.footer">
-      <slot name="footer" />
-    </v-card-actions>
+    <v-card-text
+      v-if="hasAction"
+      :class="{
+        'pb-0': showTaskForm,
+      }"
+    >
+      <div v-if="!showTaskForm">
+        <v-btn
+          @click="openTaskForm"
+          :prepend-icon="mdiPlusCircle"
+          block
+          color="primary"
+          variant="text"
+        >
+          Add task
+        </v-btn>
+      </div>
+      <TaskForm v-model="showTaskForm" />
+    </v-card-text>
   </v-card>
-
-  <TaskDetail v-model="showTaskDetail" />
 </template>
 
 <script setup>
-import { mdiTrashCan } from '@mdi/js'
-import { useTaskStore } from '@/stores/useTaskStore'
-import { useDate } from 'vuetify/lib/framework.mjs'
 import { ref } from 'vue'
-import TaskDetail from './TaskDetail.vue'
+import { useDate } from 'vuetify'
+import { mdiPlusCircle, mdiTrashCan } from '@mdi/js'
+import { useTaskStore } from '@/stores/useTaskStore'
+import TaskForm from './TaskForm.vue'
 
 const dateAdapter = useDate()
 const taskStore = useTaskStore()
@@ -63,6 +77,10 @@ defineProps({
   tasks: {
     type: Array,
     default: () => [],
+  },
+  hasAction: {
+    type: Boolean,
+    default: false,
   },
 })
 
@@ -82,14 +100,18 @@ const completeTask = (key, value) => {
   taskStore.setTaskComplete(key, value)
 }
 
-const deleteTask = (key) => {
-  taskStore.deleteTask(key)
+const deleteTask = (key, parentKey) => {
+  taskStore.deleteTask(key, parentKey)
 }
 
-// TaskDetail logic
-const showTaskDetail = ref(false)
+// TaskForm logic
+const showTaskForm = ref(false)
+const openTaskForm = () => {
+  showTaskForm.value = true
+}
+
+// show task logic
 const openTaskDetail = (key) => {
   taskStore.setActiveKey(key)
-  showTaskDetail.value = true
 }
 </script>
