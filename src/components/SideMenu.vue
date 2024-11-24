@@ -16,14 +16,18 @@
       :to="item.path"
     >
       <template #prepend>
-        <v-icon :icon="item.icon"></v-icon>
+        <v-icon :icon="item.meta.icon"></v-icon>
       </template>
 
-      <v-list-item-title>{{ item.title }}</v-list-item-title>
+      <v-list-item-title>{{ item.meta.title }}</v-list-item-title>
       <template #append>
-        <v-chip variant="outlined" size="x-small">
-          {{ getAmount(i) }}
-        </v-chip>
+        <v-badge
+          v-show="getAmount(item.name) > 0 && item.name !== ROUTE_NAME_FINISHED"
+          :content="getAmount(item.name)"
+          v-bind="getProps(item.name)"
+          inline
+        >
+        </v-badge>
       </template>
     </v-list-item>
   </v-list>
@@ -36,15 +40,14 @@ import { useRouter } from 'vue-router'
 import { mdiPlusCircle } from '@mdi/js'
 import { useTaskStore } from '@/stores/useTaskStore'
 import TaskForm from './TaskForm.vue'
+import {
+  ROUTE_NAME_TODAY,
+  ROUTE_NAME_UPCOMING,
+  ROUTE_NAME_FINISHED,
+} from '@/constants'
 
 const routes = computed(() => {
-  return useRouter()
-    .getRoutes()
-    .map((item) => ({
-      path: item.path,
-      title: item.meta.title,
-      icon: item.meta.icon,
-    }))
+  return useRouter().getRoutes()
 })
 
 // TaskForm logic
@@ -66,14 +69,30 @@ const amountTasksCompleted = computed(() => {
   return taskStore.getTasksCompleted().length
 })
 
-const getAmount = (i) => {
-  switch (i) {
-    case 0:
-      return amountTasksTodayAndOverdue
-    case 1:
-      return amountTasksUpcoming
-    case 2:
-      return amountTasksCompleted
+const getAmount = (routeName) => {
+  switch (routeName) {
+    case ROUTE_NAME_TODAY:
+      return amountTasksTodayAndOverdue.value
+    case ROUTE_NAME_UPCOMING:
+      return amountTasksUpcoming.value
+    case ROUTE_NAME_FINISHED:
+      return amountTasksCompleted.value
+  }
+}
+const getProps = (routeName) => {
+  switch (routeName) {
+    case ROUTE_NAME_TODAY:
+      return {
+        color: 'red',
+      }
+    case ROUTE_NAME_UPCOMING:
+      return {
+        color: 'info',
+      }
+    case ROUTE_NAME_FINISHED:
+      return {
+        color: '',
+      }
   }
 }
 </script>
