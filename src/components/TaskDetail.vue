@@ -154,76 +154,78 @@
           </v-col>
 
           <v-col cols="12" md="3" class="px-3">
-            <TaskDetailMenu>
-              <template #title> Due date </template>
-              <v-menu
-                v-model="menuDatePicker"
-                :close-on-content-click="false"
-                location="bottom"
-              >
-                <template v-slot:activator="{ props }">
-                  <v-btn
-                    :prepend-icon="mdiCalendar"
-                    color="primary"
-                    variant="text"
-                    size="small"
-                    block
-                    v-bind="props"
-                  >
-                    {{ formatDate(getTaskDetails.date) }}
-                  </v-btn>
-                </template>
-
-                <v-date-picker
-                  :model-value="form.taskDate.val"
-                  @update:model-value="setTaskDate"
-                  :min="minDate"
-                  hide-header
-                ></v-date-picker>
-              </v-menu>
-            </TaskDetailMenu>
-
-            <TaskDetailMenu>
-              <template #title> Priority </template>
-              <v-menu
-                v-model="menuPriority"
-                :close-on-content-click="false"
-                location="bottom"
-              >
-                <template v-slot:activator="{ props }">
-                  <v-btn
-                    :prepend-icon="mdiFlag"
-                    :color="getPriorityColor(form.taskPriority.val)"
-                    variant="text"
-                    size="small"
-                    v-bind="props"
-                    block
-                  >
-                    {{
-                      form.taskPriority.val < 4
-                        ? `P${form.taskPriority.val}`
-                        : 'Priority'
-                    }}
-                  </v-btn>
-                </template>
-
-                <v-list>
-                  <v-list-item
-                    v-for="(item, i) in priorityOptions"
-                    :key="`prio-${i}`"
-                    :base-color="item.color"
-                    @click="setTaskPriority(item.value)"
-                  >
-                    <template #prepend>
-                      <v-icon :icon="mdiFlag"></v-icon>
-                    </template>
-                    <v-list-item-title
-                      >Priority {{ item.value }}</v-list-item-title
+            <template v-if="!getTaskDetails.isCompleted">
+              <TaskDetailMenu>
+                <template #title> Due date </template>
+                <v-menu
+                  v-model="menuDatePicker"
+                  :close-on-content-click="false"
+                  location="bottom"
+                >
+                  <template v-slot:activator="{ props }">
+                    <v-btn
+                      :prepend-icon="mdiCalendar"
+                      color="primary"
+                      variant="text"
+                      size="small"
+                      block
+                      v-bind="props"
                     >
-                  </v-list-item>
-                </v-list>
-              </v-menu>
-            </TaskDetailMenu>
+                      {{ formatDate(getTaskDetails.date) }}
+                    </v-btn>
+                  </template>
+
+                  <v-date-picker
+                    :model-value="form.taskDate.val"
+                    @update:model-value="setTaskDate"
+                    :min="minDate"
+                    hide-header
+                  ></v-date-picker>
+                </v-menu>
+              </TaskDetailMenu>
+
+              <TaskDetailMenu>
+                <template #title> Priority </template>
+                <v-menu
+                  v-model="menuPriority"
+                  :close-on-content-click="false"
+                  location="bottom"
+                >
+                  <template v-slot:activator="{ props }">
+                    <v-btn
+                      :prepend-icon="mdiFlag"
+                      :color="getPriorityColor(form.taskPriority.val)"
+                      variant="text"
+                      size="small"
+                      v-bind="props"
+                      block
+                    >
+                      {{
+                        form.taskPriority.val < 4
+                          ? `P${form.taskPriority.val}`
+                          : 'Priority'
+                      }}
+                    </v-btn>
+                  </template>
+
+                  <v-list>
+                    <v-list-item
+                      v-for="(item, i) in priorityOptions"
+                      :key="`prio-${i}`"
+                      :base-color="item.color"
+                      @click="setTaskPriority(item.value)"
+                    >
+                      <template #prepend>
+                        <v-icon :icon="mdiFlag"></v-icon>
+                      </template>
+                      <v-list-item-title
+                        >Priority {{ item.value }}</v-list-item-title
+                      >
+                    </v-list-item>
+                  </v-list>
+                </v-menu>
+              </TaskDetailMenu>
+            </template>
           </v-col>
         </v-row>
       </v-card-text>
