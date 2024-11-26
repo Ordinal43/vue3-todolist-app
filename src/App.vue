@@ -30,19 +30,18 @@ import { useDisplay } from 'vuetify'
 import SideMenu from '@/components/SideMenu.vue'
 import TaskDetail from './components/TaskDetail.vue'
 
+const route = useRoute()
+const { mobile } = useDisplay()
+
 // nav drawer logic
 const showDrawer = ref(false)
 const toggleDrawer = () => {
   showDrawer.value = !showDrawer.value
 }
 
-const { mobile } = useDisplay()
 watchEffect(() => {
   if (!mobile.value) {
     showDrawer.value = true
   }
 })
-
-// nav bar logic
-const route = useRoute()
 </script>
