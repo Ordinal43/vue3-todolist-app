@@ -237,9 +237,9 @@ import {
 } from '@mdi/js'
 import { useTaskStore } from '@/stores/useTaskStore'
 import { useDetailStore } from '@/stores/useDetailStore'
-import { useDatePicker } from '@/composables/useDatePicker'
-import { useTaskPriority } from '@/composables/useTaskPriority'
+import { useDateTimeFormatter } from '@/composables/useDateTimeFormatter'
 import { useTaskDetailModal } from '@/composables/useTaskDetailModal'
+import { useTaskPriority } from '@/composables/useTaskPriority'
 import { useFormInputs } from '@/composables/useFormInputs'
 import TaskList from './TaskList.vue'
 import TaskDetailMenu from './TaskDetailMenu.vue'
@@ -247,9 +247,9 @@ import DateTimePicker from './DateTimePicker.vue'
 
 const taskStore = useTaskStore()
 const detailStore = useDetailStore()
-const { formatDate } = useDatePicker()
-const { menuPriority, priorityOptions, getPriorityColor } = useTaskPriority()
+const { formatDate } = useDateTimeFormatter()
 const { openTaskDetail } = useTaskDetailModal()
+const { menuPriority, priorityOptions, getPriorityColor } = useTaskPriority()
 const { form, isFormValid, inputTaskNameRef, setFormData } = useFormInputs()
 
 // dialog logic

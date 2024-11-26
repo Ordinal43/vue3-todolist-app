@@ -46,22 +46,27 @@
 
 <script setup>
 import { VTimePicker } from 'vuetify/labs/VTimePicker'
-import { useDate } from 'vuetify'
 import { mdiClock, mdiClose } from '@mdi/js'
 import { useDatePicker } from '@/composables/useDatePicker'
 import { useTimePicker } from '@/composables/useTimePicker'
 import { watch } from 'vue'
+import { useDateTimeFormatter } from '@/composables/useDateTimeFormatter'
 
 const { minDate, menuDatePicker } = useDatePicker()
 const { menuTimePicker, time } = useTimePicker()
-const dateAdapter = useDate()
+const { formatTime } = useDateTimeFormatter()
 
 const props = defineProps(['modelValue'])
 const emit = defineEmits(['update:modelValue'])
 
 watch(menuDatePicker, (newValue) => {
-  if (newValue === true) {
-    time.value = dateAdapter.format(props.modelValue, 'fullTime24h')
+  const dateObj = props.modelValue
+  if (
+    newValue === true &&
+    dateObj.getHours() !== 0 &&
+    dateObj.getMinutes() !== 0
+  ) {
+    time.value = formatTime(dateObj)
   }
 })
 
