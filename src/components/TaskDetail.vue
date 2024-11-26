@@ -16,7 +16,7 @@
               {{ getParentTask.name }}
             </v-btn>
             <v-menu v-model="menuSiblingTask" location="bottom">
-              <template v-slot:activator="{ props }">
+              <template #activator="{ props }">
                 <v-btn
                   :prepend-icon="mdiFileTree"
                   :append-icon="mdiChevronRight"
@@ -62,7 +62,7 @@
                 <v-checkbox
                   :model-value="getTaskDetails.isCompleted"
                   @update:model-value="
-                    (value) => setTaskStatus(getTaskDetails.key, value)
+                    (event) => setTaskStatus(getTaskDetails.key, event)
                   "
                   :base-color="getPriorityColor(getTaskDetails.priority)"
                   :color="getPriorityColor(getTaskDetails.priority)"
@@ -157,12 +157,11 @@
             <template v-if="!getTaskDetails.isCompleted">
               <TaskDetailMenu>
                 <template #title> Due date </template>
-                <v-menu
-                  v-model="menuDatePicker"
-                  :close-on-content-click="false"
-                  location="bottom"
+                <DateTimePicker
+                  :model-value="form.taskDate.val"
+                  @update:model-value="setTaskDate"
                 >
-                  <template v-slot:activator="{ props }">
+                  <template #activator="{ props }">
                     <v-btn
                       :prepend-icon="mdiCalendar"
                       color="primary"
@@ -174,43 +173,7 @@
                       {{ formatDate(getTaskDetails.date) }}
                     </v-btn>
                   </template>
-
-                  <v-card>
-                    <v-date-picker
-                      :model-value="form.taskDate.val"
-                      @update:model-value="setTaskDate"
-                      :min="minDate"
-                      hide-header
-                    ></v-date-picker>
-
-                    <v-divider></v-divider>
-                    <div class="pa-3">
-                      <v-btn-group divided variant="outlined" density="compact">
-                        <v-btn :prepend-icon="mdiClock">
-                          {{ time ?? 'Time' }}
-                          <v-menu
-                            activator="parent"
-                            v-model="menuTimePicker"
-                            :close-on-content-click="false"
-                          >
-                            <v-time-picker
-                              :model-value="time"
-                              @update:model-value="setTaskDate"
-                              format="24hr"
-                              color="primary"
-                              hide-header
-                            ></v-time-picker>
-                          </v-menu>
-                        </v-btn>
-                        <v-btn
-                          v-if="time"
-                          @click="resetTimePicker"
-                          :icon="mdiClose"
-                        ></v-btn>
-                      </v-btn-group>
-                    </div>
-                  </v-card>
-                </v-menu>
+                </DateTimePicker>
               </TaskDetailMenu>
 
               <TaskDetailMenu>
@@ -220,7 +183,7 @@
                   :close-on-content-click="false"
                   location="bottom"
                 >
-                  <template v-slot:activator="{ props }">
+                  <template #activator="{ props }">
                     <v-btn
                       :prepend-icon="mdiFlag"
                       :color="getPriorityColor(form.taskPriority.val)"
@@ -264,12 +227,10 @@
 
 <script setup>
 import { computed, nextTick, provide, ref, watchEffect } from 'vue'
-import { VTimePicker } from 'vuetify/labs/VTimePicker'
 import {
   mdiCalendar,
   mdiCheck,
   mdiChevronRight,
-  mdiClock,
   mdiClose,
   mdiFileTree,
   mdiFlag,
@@ -277,20 +238,17 @@ import {
 import { useTaskStore } from '@/stores/useTaskStore'
 import { useDetailStore } from '@/stores/useDetailStore'
 import { useDatePicker } from '@/composables/useDatePicker'
-import { useTimePicker } from '@/composables/useTimePicker'
 import { useTaskPriority } from '@/composables/useTaskPriority'
 import { useTaskDetailModal } from '@/composables/useTaskDetailModal'
 import { useFormInputs } from '@/composables/useFormInputs'
 import TaskList from './TaskList.vue'
 import TaskDetailMenu from './TaskDetailMenu.vue'
+import DateTimePicker from './DateTimePicker.vue'
 
 const taskStore = useTaskStore()
 const detailStore = useDetailStore()
-const { minDate, menuDatePicker, formatDate, setDateAndClose } = useDatePicker()
-const { menuTimePicker, time, resetTimePicker, closeTimePicker } =
-  useTimePicker()
-const { menuPriority, priorityOptions, getPriorityColor, setPriorityAndClose } =
-  useTaskPriority()
+const { formatDate } = useDatePicker()
+const { menuPriority, priorityOptions, getPriorityColor } = useTaskPriority()
 const { openTaskDetail } = useTaskDetailModal()
 const { form, isFormValid, inputTaskNameRef, setFormData } = useFormInputs()
 
@@ -382,24 +340,14 @@ const submitForm = () => {
 
 // menu date-picker logic
 const setTaskDate = (event) => {
-  setDateAndClose(() => {
-    closeTimePicker()
-    const formDate = form.value.taskDate
-    if (event instanceof Date) {
-      formDate.val = event
-    } else {
-      if (event !== null) {
-        formDate.val.setHours(...event.split(':'))
-      }
-    }
-    taskStore.updateTaskDate(detailStore.activeKey, formDate.val)
-  })
+  const formDate = form.value.taskDate
+  formDate.val = event
+  taskStore.updateTaskDate(detailStore.activeKey, formDate.val)
 }
 
 // menu priority logic
 const setTaskPriority = (priority) => {
-  setPriorityAndClose(() => {
-    taskStore.updateTaskPriority(detailStore.activeKey, priority)
-  })
+  taskStore.updateTaskPriority(detailStore.activeKey, priority)
+  menuPriority.value = false
 }
 </script>

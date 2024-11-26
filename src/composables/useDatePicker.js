@@ -11,7 +11,6 @@ export const useDatePicker = () => {
 
   const formatDate = (dateValue) => {
     const shortDate = dateAdapter.format(dateValue, 'shortDate')
-
     dateValue = new Date(dateValue)
 
     if (dateValue.getHours() === 0 && dateValue.getMinutes() === 0) {
@@ -22,15 +21,9 @@ export const useDatePicker = () => {
     }
   }
 
-  const setDateAndClose = (callback) => {
-    callback()
-    menuDatePicker.value = false
-  }
-
   return {
     minDate,
     menuDatePicker,
     formatDate,
-    setDateAndClose,
   }
 }

@@ -17,7 +17,7 @@
         <v-col cols="1">
           <v-checkbox
             :model-value="task.isCompleted"
-            @update:model-value="(value) => setTaskStatus(task.key, value)"
+            @update:model-value="(event) => setTaskStatus(task.key, event)"
             :base-color="getPriorityColor(task.priority)"
             :color="getPriorityColor(task.priority)"
             hide-details
