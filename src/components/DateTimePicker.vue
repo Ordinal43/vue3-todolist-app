@@ -8,36 +8,26 @@
       <slot name="activator" :props="props"></slot>
     </template>
     <v-card>
-      <v-date-picker
-        :model-value="props.modelValue"
-        @update:model-value="setTaskDate"
-        :min="minDate"
-        hide-header
-      ></v-date-picker>
+      <v-date-picker v-model="date" :min="minDate" hide-header></v-date-picker>
 
       <v-divider></v-divider>
       <div class="pa-3">
         <v-btn-group divided variant="outlined" density="compact">
           <v-btn :prepend-icon="mdiClock">
-            {{ time ?? 'Time' }}
+            {{ time ? formatTime(time) : 'Time' }}
             <v-menu
               activator="parent"
               v-model="menuTimePicker"
               :close-on-content-click="false"
             >
               <v-time-picker
-                :model-value="time"
-                @update:model-value="setTaskTime"
+                v-model="time"
                 format="24hr"
                 color="primary"
               ></v-time-picker>
             </v-menu>
           </v-btn>
-          <v-btn
-            v-if="time"
-            @click="setTaskTime(null)"
-            :icon="mdiClose"
-          ></v-btn>
+          <v-btn v-if="time" @click="resetTime" :icon="mdiClose"></v-btn>
         </v-btn-group>
       </div>
     </v-card>
@@ -53,45 +43,22 @@ import { useStateTimePicker } from '@/composables/states/useStateTimePicker'
 import { useMethodDateFormatter } from '@/composables/methods/useMethodDateFormatter'
 
 const { minDate, menuDatePicker } = useStateDatePicker()
-const { menuTimePicker, time } = useStateTimePicker()
+const { menuTimePicker } = useStateTimePicker()
 const { formatTime } = useMethodDateFormatter()
 
-const props = defineProps(['modelValue'])
-const emit = defineEmits(['update:modelValue'])
+const date = defineModel('date')
+const time = defineModel('time')
 
-watch(menuDatePicker, (newValue) => {
-  const dateObj = props.modelValue
-  if (
-    newValue === true &&
-    dateObj.getHours() !== 0 &&
-    dateObj.getMinutes() !== 0
-  ) {
-    time.value = formatTime(dateObj)
-  }
-})
-
-const setTaskTime = (event) => {
-  time.value = event
-  const newDate = new Date(props.modelValue)
-
-  emitDate(newDate)
-  menuTimePicker.value = false
+const resetTime = () => {
+  time.value = null
 }
 
-const setTaskDate = (event) => {
-  const newDate = event
-
-  emitDate(newDate)
+watch(date, () => {
   menuTimePicker.value = false
   menuDatePicker.value = false
-}
+})
 
-const emitDate = (newDate) => {
-  if (time.value !== null) {
-    newDate.setHours(...time.value.split(':'))
-  } else {
-    newDate.setHours(0, 0)
-  }
-  emit('update:modelValue', newDate)
-}
+watch(time, () => {
+  menuTimePicker.value = false
+})
 </script>

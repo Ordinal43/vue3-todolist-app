@@ -20,6 +20,9 @@ export const useStateFormInputs = () => {
     taskDate: {
       val: todayMidnight,
     },
+    taskTime: {
+      val: null,
+    },
     taskPriority: {
       val: 4,
     },
@@ -30,11 +33,12 @@ export const useStateFormInputs = () => {
   const formRef = useTemplateRef('form-task')
   const inputTaskNameRef = useTemplateRef('input-task-name')
 
-  const setFormData = ({ name, desc, dateStr, priority }) => {
+  const setFormData = ({ name, desc, dateStr, time, priority }) => {
     const dateObj = new Date(dateStr)
     form.value.taskName.val = name
     form.value.taskDesc.val = desc
     form.value.taskDate.val = dateObj
+    form.value.taskTime.val = time
     form.value.taskPriority.val = priority
   }
 

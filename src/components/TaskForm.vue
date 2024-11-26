@@ -33,8 +33,8 @@
 
           <div class="mt-5 d-flex ga-2">
             <DateTimePicker
-              :model-value="form.taskDate.val"
-              @update:model-value="setTaskDate"
+              v-model:date="form.taskDate.val"
+              v-model:time="form.taskTime.val"
             >
               <template #activator="{ props }">
                 <v-btn
@@ -44,6 +44,7 @@
                   v-bind="props"
                 >
                   {{ formatDate(form.taskDate.val) }}
+                  {{ formatTime(form.taskTime.val) }}
                 </v-btn>
               </template>
             </DateTimePicker>
@@ -79,9 +80,9 @@
                   <template #prepend>
                     <v-icon :icon="mdiFlag"></v-icon>
                   </template>
-                  <v-list-item-title
-                    >Priority {{ item.value }}</v-list-item-title
-                  >
+                  <v-list-item-title>
+                    Priority {{ item.value }}
+                  </v-list-item-title>
                 </v-list-item>
               </v-list>
             </v-menu>
@@ -127,7 +128,7 @@ const { menuPriority, priorityOptions, getPriorityColor } =
   useStateTaskPriority()
 const { form, isFormValid, formRef, inputTaskNameRef, resetForm } =
   useStateFormInputs()
-const { formatDate } = useMethodDateFormatter()
+const { formatDate, formatTime } = useMethodDateFormatter()
 
 // dialog logic
 const showForm = defineModel()
@@ -172,11 +173,6 @@ const getVariant = computed(() => {
   }
 })
 
-// menu date-time-picker logic
-const setTaskDate = (event) => {
-  form.value.taskDate.val = event
-}
-
 // menu priority logic
 const setTaskPriority = (priority) => {
   form.value.taskPriority.val = priority
@@ -197,13 +193,15 @@ const isSubtaskForm = inject('isSubtaskForm', false)
 
 const submitForm = () => {
   if (isFormValid.value === true) {
-    const { taskName, taskDesc, taskDate, taskPriority } = form.value
+    const { taskName, taskDesc, taskDate, taskTime, taskPriority } = form.value
     const parentKey = isSubtaskForm ? detailStore.activeKey : null
     const parentLevel = taskStore.tasks.get(parentKey)?.level ?? 0
+
     taskStore.addNewTask(parentKey, parentLevel, {
       name: taskName.val,
       desc: taskDesc.val,
       date: taskDate.val,
+      time: taskTime.val,
       priority: taskPriority.val,
     })
     closeForm()

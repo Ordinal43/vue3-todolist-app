@@ -158,8 +158,8 @@
               <TaskDetailMenu>
                 <template #title> Due date </template>
                 <DateTimePicker
-                  :model-value="form.taskDate.val"
-                  @update:model-value="setTaskDate"
+                  v-model:date="form.taskDate.val"
+                  v-model:time="form.taskTime.val"
                 >
                   <template #activator="{ props }">
                     <v-btn
@@ -170,7 +170,8 @@
                       block
                       v-bind="props"
                     >
-                      {{ formatDate(getTaskDetails.date) }}
+                      {{ formatDate(form.taskDate.val) }}
+                      {{ formatTime(form.taskTime.val) }}
                     </v-btn>
                   </template>
                 </DateTimePicker>
@@ -210,9 +211,9 @@
                       <template #prepend>
                         <v-icon :icon="mdiFlag"></v-icon>
                       </template>
-                      <v-list-item-title
-                        >Priority {{ item.value }}</v-list-item-title
-                      >
+                      <v-list-item-title>
+                        Priority {{ item.value }}
+                      </v-list-item-title>
                     </v-list-item>
                   </v-list>
                 </v-menu>
@@ -226,7 +227,7 @@
 </template>
 
 <script setup>
-import { computed, nextTick, provide, ref, watchEffect } from 'vue'
+import { computed, nextTick, provide, ref, watch } from 'vue'
 import {
   mdiCalendar,
   mdiCheck,
@@ -252,7 +253,7 @@ const { menuPriority, priorityOptions, getPriorityColor } =
   useStateTaskPriority()
 const { form, isFormValid, inputTaskNameRef, setFormData } =
   useStateFormInputs()
-const { formatDate } = useMethodDateFormatter()
+const { formatDate, formatTime } = useMethodDateFormatter()
 
 // dialog logic
 const showTaskDetail = computed(() => {
@@ -292,7 +293,7 @@ const getSubtasks = computed(() => {
   return taskStore.getSubtasks(detailStore.activeKey)
 })
 
-// input logic
+// edit form logic
 const showEditForm = ref(false)
 
 const openEditForm = async () => {
@@ -307,23 +308,24 @@ const closeEditForm = () => {
 }
 
 const setFormToInitial = () => {
-  const { name, desc, date, priority } = getTaskDetails.value
+  const { name, desc, date, time, priority } = getTaskDetails.value
   setFormData({
     name: name,
     desc: desc,
     dateStr: date,
+    time: time,
     priority: priority,
   })
 }
 
-watchEffect(() => {
-  if (getTaskDetails.value) {
+watch(getTaskDetails, (newValue) => {
+  if (newValue) {
     setFormToInitial()
   }
 })
 
-watchEffect(async () => {
-  if (showTaskDetail.value === false) {
+watch(showTaskDetail, async (newValue) => {
+  if (newValue === false) {
     await nextTick()
     showEditForm.value = false
   }
@@ -340,15 +342,17 @@ const submitForm = () => {
   }
 }
 
-// menu date-picker logic
-const setTaskDate = (event) => {
-  const formDate = form.value.taskDate
-  formDate.val = event
-  taskStore.updateTaskDate(detailStore.activeKey, formDate.val)
-}
+// right sidebar input logic
+watch(form.value.taskDate, (newDate) => {
+  taskStore.updateTaskDate(detailStore.activeKey, newDate.val)
+})
 
-// menu priority logic
+watch(form.value.taskTime, (newTime) => {
+  taskStore.updateTaskTime(detailStore.activeKey, newTime.val)
+})
+
 const setTaskPriority = (priority) => {
+  form.value.taskPriority.val = priority
   taskStore.updateTaskPriority(detailStore.activeKey, priority)
   menuPriority.value = false
 }

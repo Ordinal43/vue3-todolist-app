@@ -3,21 +3,15 @@ import { useDate } from 'vuetify'
 export const useMethodDateFormatter = () => {
   const dateAdapter = useDate()
   const formatDate = (dateValue) => {
-    const shortDate = dateAdapter.format(dateValue, 'shortDate')
-    dateValue = new Date(dateValue)
-
-    if (dateValue.getHours() === 0 && dateValue.getMinutes() === 0) {
-      return shortDate
-    } else {
-      const time = dateAdapter.format(dateValue, 'fullTime12h')
-      return `${shortDate} ${time}`
-    }
+    return dateAdapter.format(dateValue, 'shortDate')
   }
 
-  const formatTime = (dateObj) => {
-    const hours = dateObj.getHours().toString().padStart(2, '0')
-    const minutes = dateObj.getMinutes().toString().padStart(2, '0')
-    return `${hours}:${minutes}`
+  const formatTime = (time) => {
+    // replace this with AM PM later!
+    if (time !== null) {
+      return time
+    }
+    return ''
   }
 
   return {
