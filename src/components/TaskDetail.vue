@@ -16,7 +16,7 @@
               {{ getParentTask.name }}
             </v-btn>
             <v-menu v-model="menuSiblingTask" location="bottom">
-              <template v-slot:activator="{ props }">
+              <template #activator="{ props }">
                 <v-btn
                   :prepend-icon="mdiFileTree"
                   :append-icon="mdiChevronRight"
@@ -62,7 +62,7 @@
                 <v-checkbox
                   :model-value="getTaskDetails.isCompleted"
                   @update:model-value="
-                    (value) => setTaskStatus(getTaskDetails.key, value)
+                    (event) => setTaskStatus(getTaskDetails.key, event)
                   "
                   :base-color="getPriorityColor(getTaskDetails.priority)"
                   :color="getPriorityColor(getTaskDetails.priority)"
@@ -157,12 +157,11 @@
             <template v-if="!getTaskDetails.isCompleted">
               <TaskDetailMenu>
                 <template #title> Due date </template>
-                <v-menu
-                  v-model="menuDatePicker"
-                  :close-on-content-click="false"
-                  location="bottom"
+                <DateTimePicker
+                  v-model:date="form.taskDate.val"
+                  v-model:time="form.taskTime.val"
                 >
-                  <template v-slot:activator="{ props }">
+                  <template #activator="{ props }">
                     <v-btn
                       :prepend-icon="mdiCalendar"
                       color="primary"
@@ -171,17 +170,11 @@
                       block
                       v-bind="props"
                     >
-                      {{ formatDate(getTaskDetails.date) }}
+                      {{ formatDate(form.taskDate.val) }}
+                      {{ formatTime(form.taskTime.val) }}
                     </v-btn>
                   </template>
-
-                  <v-date-picker
-                    :model-value="form.taskDate.val"
-                    @update:model-value="setTaskDate"
-                    :min="minDate"
-                    hide-header
-                  ></v-date-picker>
-                </v-menu>
+                </DateTimePicker>
               </TaskDetailMenu>
 
               <TaskDetailMenu>
@@ -191,7 +184,7 @@
                   :close-on-content-click="false"
                   location="bottom"
                 >
-                  <template v-slot:activator="{ props }">
+                  <template #activator="{ props }">
                     <v-btn
                       :prepend-icon="mdiFlag"
                       :color="getPriorityColor(form.taskPriority.val)"
@@ -218,9 +211,9 @@
                       <template #prepend>
                         <v-icon :icon="mdiFlag"></v-icon>
                       </template>
-                      <v-list-item-title
-                        >Priority {{ item.value }}</v-list-item-title
-                      >
+                      <v-list-item-title>
+                        Priority {{ item.value }}
+                      </v-list-item-title>
                     </v-list-item>
                   </v-list>
                 </v-menu>
@@ -234,7 +227,7 @@
 </template>
 
 <script setup>
-import { computed, nextTick, provide, ref, watchEffect } from 'vue'
+import { computed, nextTick, provide, ref, watch } from 'vue'
 import {
   mdiCalendar,
   mdiCheck,
@@ -245,20 +238,22 @@ import {
 } from '@mdi/js'
 import { useTaskStore } from '@/stores/useTaskStore'
 import { useDetailStore } from '@/stores/useDetailStore'
-import { useDatePicker } from '@/composables/useDatePicker'
-import { useTaskPriority } from '@/composables/useTaskPriority'
-import { useTaskDetailModal } from '@/composables/useTaskDetailModal'
-import { useFormInputs } from '@/composables/useFormInputs'
+import { useStateTaskDetailModal } from '@/composables/states/useStateTaskDetailModal'
+import { useStateTaskPriority } from '@/composables/states/useStateTaskPriority'
+import { useStateFormInputs } from '@/composables/states/useStateFormInputs'
+import { useMethodDateFormatter } from '@/composables/methods/useMethodDateFormatter'
 import TaskList from './TaskList.vue'
 import TaskDetailMenu from './TaskDetailMenu.vue'
+import DateTimePicker from './DateTimePicker.vue'
 
 const taskStore = useTaskStore()
 const detailStore = useDetailStore()
-const { minDate, menuDatePicker, formatDate, setDateAndClose } = useDatePicker()
-const { menuPriority, priorityOptions, getPriorityColor, setPriorityAndClose } =
-  useTaskPriority()
-const { openTaskDetail } = useTaskDetailModal()
-const { form, isFormValid, inputTaskNameRef, setFormData } = useFormInputs()
+const { openTaskDetail } = useStateTaskDetailModal()
+const { menuPriority, priorityOptions, getPriorityColor } =
+  useStateTaskPriority()
+const { form, isFormValid, inputTaskNameRef, setFormData } =
+  useStateFormInputs()
+const { formatDate, formatTime } = useMethodDateFormatter()
 
 // dialog logic
 const showTaskDetail = computed(() => {
@@ -298,7 +293,7 @@ const getSubtasks = computed(() => {
   return taskStore.getSubtasks(detailStore.activeKey)
 })
 
-// input logic
+// edit form logic
 const showEditForm = ref(false)
 
 const openEditForm = async () => {
@@ -313,23 +308,24 @@ const closeEditForm = () => {
 }
 
 const setFormToInitial = () => {
-  const { name, desc, date, priority } = getTaskDetails.value
+  const { name, desc, date, time, priority } = getTaskDetails.value
   setFormData({
     name: name,
     desc: desc,
     dateStr: date,
+    time: time,
     priority: priority,
   })
 }
 
-watchEffect(() => {
-  if (getTaskDetails.value) {
+watch(getTaskDetails, (newValue) => {
+  if (newValue) {
     setFormToInitial()
   }
 })
 
-watchEffect(async () => {
-  if (showTaskDetail.value === false) {
+watch(showTaskDetail, async (newValue) => {
+  if (newValue === false) {
     await nextTick()
     showEditForm.value = false
   }
@@ -346,17 +342,18 @@ const submitForm = () => {
   }
 }
 
-// menu date-picker logic
-const setTaskDate = (event) => {
-  setDateAndClose(() => {
-    taskStore.updateTaskDate(detailStore.activeKey, event)
-  })
-}
+// right sidebar input logic
+watch(form.value.taskDate, (newDate) => {
+  taskStore.updateTaskDate(detailStore.activeKey, newDate.val)
+})
 
-// menu priority logic
+watch(form.value.taskTime, (newTime) => {
+  taskStore.updateTaskTime(detailStore.activeKey, newTime.val)
+})
+
 const setTaskPriority = (priority) => {
-  setPriorityAndClose(() => {
-    taskStore.updateTaskPriority(detailStore.activeKey, priority)
-  })
+  form.value.taskPriority.val = priority
+  taskStore.updateTaskPriority(detailStore.activeKey, priority)
+  menuPriority.value = false
 }
 </script>

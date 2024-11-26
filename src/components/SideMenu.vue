@@ -22,7 +22,7 @@
       <v-list-item-title>{{ item.meta.title }}</v-list-item-title>
       <template #append>
         <v-badge
-          v-show="getTaskCount(item.name) > 0"
+          v-if="getTaskCount(item.name) > 0"
           :content="getTaskCount(item.name)"
           v-bind="getProps(item.name)"
           inline
@@ -61,8 +61,8 @@ import { useRouter } from 'vue-router'
 import { storeToRefs } from 'pinia'
 import { mdiPlusCircle, mdiTrashCan } from '@mdi/js'
 import { useTaskStore } from '@/stores/useTaskStore'
-import { useTaskForm } from '@/composables/useTaskForm'
-import { useClearStorage } from '@/composables/useClearStorage'
+import { useStateTaskForm } from '@/composables/states/useStateTaskForm'
+import { useStateStorageDialog } from '@/composables/states/useStateStorageDialog'
 import TaskForm from './TaskForm.vue'
 import {
   ROUTE_NAME_TODAY,
@@ -71,11 +71,11 @@ import {
 } from '@/constants'
 
 const taskStore = useTaskStore()
-const { getTasksOverdue, getTasksToday, getTasksUpcoming, getTasksCompleted } =
+const { getTasksOverdue, getTasksToday, getTasksUpcoming } =
   storeToRefs(taskStore)
-const { showTaskForm, openTaskForm } = useTaskForm()
+const { showTaskForm, openTaskForm } = useStateTaskForm()
 const { dialog, warningMessage, openDialog, closeDialog, clearStorage } =
-  useClearStorage()
+  useStateStorageDialog()
 
 // route logic
 const routes = computed(() => {
@@ -90,7 +90,7 @@ const getTaskCount = (routeName) => {
     case ROUTE_NAME_UPCOMING:
       return getTasksUpcoming.value.length
     case ROUTE_NAME_FINISHED:
-      return getTasksCompleted.value.length
+      return 0
   }
 }
 const getProps = (routeName) => {
@@ -102,11 +102,6 @@ const getProps = (routeName) => {
     case ROUTE_NAME_UPCOMING:
       return {
         color: 'info',
-      }
-    case ROUTE_NAME_FINISHED:
-      return {
-        color: '',
-        variant: 'text',
       }
   }
 }

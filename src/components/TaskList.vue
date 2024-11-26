@@ -17,7 +17,7 @@
         <v-col cols="1">
           <v-checkbox
             :model-value="task.isCompleted"
-            @update:model-value="(value) => setTaskStatus(task.key, value)"
+            @update:model-value="(event) => setTaskStatus(task.key, event)"
             :base-color="getPriorityColor(task.priority)"
             :color="getPriorityColor(task.priority)"
             hide-details
@@ -85,17 +85,17 @@ import {
   mdiTrashCan,
 } from '@mdi/js'
 import { useTaskStore } from '@/stores/useTaskStore'
-import { useCustomDate } from '@/composables/useCustomDate'
-import { useTaskPriority } from '@/composables/useTaskPriority'
-import { useTaskForm } from '@/composables/useTaskForm'
-import { useTaskDetailModal } from '@/composables/useTaskDetailModal'
+import { useStateDates } from '@/composables/states/useStateDates'
+import { useStateTaskPriority } from '@/composables/states/useStateTaskPriority'
+import { useStateTaskForm } from '@/composables/states/useStateTaskForm'
+import { useStateTaskDetailModal } from '@/composables/states/useStateTaskDetailModal'
 import TaskForm from './TaskForm.vue'
 
 const dateAdapter = useDate()
-const { todayMidnight } = useCustomDate()
-const { getPriorityColor } = useTaskPriority()
-const { showTaskForm, openTaskForm } = useTaskForm()
-const { openTaskDetail } = useTaskDetailModal()
+const { todayMidnight } = useStateDates()
+const { getPriorityColor } = useStateTaskPriority()
+const { showTaskForm, openTaskForm } = useStateTaskForm()
+const { openTaskDetail } = useStateTaskDetailModal()
 
 const taskStore = useTaskStore()
 const { setTaskStatus, deleteTask } = taskStore

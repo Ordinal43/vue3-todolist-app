@@ -6,7 +6,7 @@
       </v-navigation-drawer>
 
       <v-app-bar>
-        <template v-if="mobile" v-slot:prepend>
+        <template v-if="mobile" #prepend>
           <v-app-bar-nav-icon @click="toggleDrawer"></v-app-bar-nav-icon>
         </template>
         <v-app-bar-title>{{ route.meta.title }}</v-app-bar-title>
@@ -30,19 +30,18 @@ import { useDisplay } from 'vuetify'
 import SideMenu from '@/components/SideMenu.vue'
 import TaskDetail from './components/TaskDetail.vue'
 
+const route = useRoute()
+const { mobile } = useDisplay()
+
 // nav drawer logic
 const showDrawer = ref(false)
 const toggleDrawer = () => {
   showDrawer.value = !showDrawer.value
 }
 
-const { mobile } = useDisplay()
 watchEffect(() => {
   if (!mobile.value) {
     showDrawer.value = true
   }
 })
-
-// nav bar logic
-const route = useRoute()
 </script>

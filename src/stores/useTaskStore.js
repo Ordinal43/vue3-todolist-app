@@ -3,20 +3,24 @@ import { useLocalStorage } from '@vueuse/core'
 import { defineStore } from 'pinia'
 import { v4 as uuidv4 } from 'uuid'
 import { useDate } from 'vuetify'
-import { useCustomDate } from '@/composables/useCustomDate'
+import { useStateDates } from '@/composables/states/useStateDates'
 
 const LOCAL_STORAGE_KEY = 'todo-list-tasks'
 
 export const useTaskStore = defineStore('task', () => {
   // task CRUD logic
   const tasks = useLocalStorage(LOCAL_STORAGE_KEY, new Map())
-  const { todayMidnight } = useCustomDate()
+  const { todayMidnight } = useStateDates()
 
   const clearStorage = () => {
     tasks.value = new Map()
   }
 
-  const addNewTask = (parentKey, level = 0, { name, desc, date, priority }) => {
+  const addNewTask = (
+    parentKey,
+    level = 0,
+    { name, desc, date, time, priority },
+  ) => {
     const newId = uuidv4()
 
     tasks.value.set(newId, {
@@ -26,6 +30,7 @@ export const useTaskStore = defineStore('task', () => {
       name,
       desc,
       date,
+      time,
       priority,
       level: level + 1,
       isCompleted: false,
@@ -76,6 +81,10 @@ export const useTaskStore = defineStore('task', () => {
 
   const updateTaskDate = (key, date) => {
     tasks.value.get(key).date = date
+  }
+
+  const updateTaskTime = (key, time) => {
+    tasks.value.get(key).time = time
   }
 
   const updateTaskPriority = (key, priority) => {
@@ -142,6 +151,7 @@ export const useTaskStore = defineStore('task', () => {
     setTaskStatus,
     updateTaskValue,
     updateTaskDate,
+    updateTaskTime,
     updateTaskPriority,
     getTasksToday,
     getTasksOverdue,

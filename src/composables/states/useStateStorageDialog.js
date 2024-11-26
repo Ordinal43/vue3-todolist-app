@@ -1,7 +1,7 @@
 import { ref } from 'vue'
 import { useTaskStore } from '@/stores/useTaskStore'
 
-export const useClearStorage = () => {
+export const useStateStorageDialog = () => {
   const dialog = ref(false)
   const warningMessage = ref('Are you sure you want to clear the storage?')
 

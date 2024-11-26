@@ -1,10 +1,10 @@
 import { ref, useTemplateRef } from 'vue'
-import { useCustomDate } from './useCustomDate'
-import { useFormRules } from './useFormRules'
+import { useStateDates } from './useStateDates'
+import { useMethodFormRules } from '../methods/useMethodFormRules'
 
-export const useFormInputs = () => {
-  const { todayMidnight } = useCustomDate()
-  const { ruleRequired, ruleMaxLen } = useFormRules()
+export const useStateFormInputs = () => {
+  const { todayMidnight } = useStateDates()
+  const { ruleRequired, ruleMaxLen } = useMethodFormRules()
 
   const getInitialData = () => ({
     taskName: {
@@ -20,6 +20,9 @@ export const useFormInputs = () => {
     taskDate: {
       val: todayMidnight,
     },
+    taskTime: {
+      val: null,
+    },
     taskPriority: {
       val: 4,
     },
@@ -30,10 +33,12 @@ export const useFormInputs = () => {
   const formRef = useTemplateRef('form-task')
   const inputTaskNameRef = useTemplateRef('input-task-name')
 
-  const setFormData = ({ name, desc, dateStr, priority }) => {
+  const setFormData = ({ name, desc, dateStr, time, priority }) => {
+    const dateObj = new Date(dateStr)
     form.value.taskName.val = name
     form.value.taskDesc.val = desc
-    form.value.taskDate.val = new Date(dateStr)
+    form.value.taskDate.val = dateObj
+    form.value.taskTime.val = time
     form.value.taskPriority.val = priority
   }
 

@@ -1,6 +1,6 @@
 import { ref } from 'vue'
 
-export const useTaskPriority = () => {
+export const useStateTaskPriority = () => {
   const menuPriority = ref(false)
   const priorityOptions = [
     { value: 1, color: 'red' },
@@ -9,8 +9,8 @@ export const useTaskPriority = () => {
     { value: 4, color: 'grey' },
   ]
 
-  const getPriorityColor = (value) => {
-    switch (value) {
+  const getPriorityColor = (priority) => {
+    switch (priority) {
       case 1:
         return 'red'
       case 2:
@@ -22,15 +22,9 @@ export const useTaskPriority = () => {
     }
   }
 
-  const setPriorityAndClose = (callback) => {
-    callback()
-    menuPriority.value = false
-  }
-
   return {
     menuPriority,
     priorityOptions,
     getPriorityColor,
-    setPriorityAndClose,
   }
 }
