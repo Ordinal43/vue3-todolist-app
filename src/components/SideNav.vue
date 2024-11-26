@@ -82,7 +82,7 @@ const routes = computed(() => {
   return useRouter().getRoutes()
 })
 
-// sidemenu logic
+// side-nav logic
 const getTaskCount = (routeName) => {
   switch (routeName) {
     case ROUTE_NAME_TODAY:
