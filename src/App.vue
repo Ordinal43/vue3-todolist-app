@@ -6,7 +6,7 @@
       </v-navigation-drawer>
 
       <v-app-bar>
-        <template v-if="mobile" v-slot:prepend>
+        <template v-if="mobile" #prepend>
           <v-app-bar-nav-icon @click="toggleDrawer"></v-app-bar-nav-icon>
         </template>
         <v-app-bar-title>{{ route.meta.title }}</v-app-bar-title>

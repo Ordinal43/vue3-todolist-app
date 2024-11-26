@@ -10,18 +10,20 @@ export const useDatePicker = () => {
   const menuDatePicker = ref(false)
 
   const formatDate = (dateValue) => {
-    return dateAdapter.format(dateValue, 'normalDateWithWeekday')
-  }
+    const shortDate = dateAdapter.format(dateValue, 'shortDate')
+    dateValue = new Date(dateValue)
 
-  const setDateAndClose = (callback) => {
-    callback()
-    menuDatePicker.value = false
+    if (dateValue.getHours() === 0 && dateValue.getMinutes() === 0) {
+      return shortDate
+    } else {
+      const time = dateAdapter.format(dateValue, 'fullTime12h')
+      return `${shortDate} ${time}`
+    }
   }
 
   return {
     minDate,
     menuDatePicker,
     formatDate,
-    setDateAndClose,
   }
 }
