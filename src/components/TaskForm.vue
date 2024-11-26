@@ -49,11 +49,7 @@
               </template>
             </DateTimePicker>
 
-            <v-menu
-              v-model="menuPriority"
-              :close-on-content-click="false"
-              location="bottom"
-            >
+            <PriorityPicker v-model="form.taskPriority.val">
               <template #activator="{ props }">
                 <v-btn
                   :prepend-icon="mdiFlag"
@@ -69,23 +65,7 @@
                   }}
                 </v-btn>
               </template>
-
-              <v-list>
-                <v-list-item
-                  v-for="(item, i) in priorityOptions"
-                  :key="`prio-${i}`"
-                  :base-color="item.color"
-                  @click="setTaskPriority(item.value)"
-                >
-                  <template #prepend>
-                    <v-icon :icon="mdiFlag"></v-icon>
-                  </template>
-                  <v-list-item-title>
-                    Priority {{ item.value }}
-                  </v-list-item-title>
-                </v-list-item>
-              </v-list>
-            </v-menu>
+            </PriorityPicker>
           </div>
         </v-card-text>
 
@@ -121,11 +101,11 @@ import { useStateTaskPriority } from '@/composables/states/useStateTaskPriority'
 import { useStateFormInputs } from '@/composables/states/useStateFormInputs'
 import { useMethodDateFormatter } from '@/composables/methods/useMethodDateFormatter'
 import DateTimePicker from './DateTimePicker.vue'
+import PriorityPicker from './PriorityPicker.vue'
 
 const taskStore = useTaskStore()
 const detailStore = useDetailStore()
-const { menuPriority, priorityOptions, getPriorityColor } =
-  useStateTaskPriority()
+const { getPriorityColor } = useStateTaskPriority()
 const { form, isFormValid, formRef, inputTaskNameRef, resetForm } =
   useStateFormInputs()
 const { formatDate, formatTime } = useMethodDateFormatter()
@@ -172,12 +152,6 @@ const getVariant = computed(() => {
       return 'outlined'
   }
 })
-
-// menu priority logic
-const setTaskPriority = (priority) => {
-  form.value.taskPriority.val = priority
-  menuPriority.value = false
-}
 
 // form logic
 watchEffect(async () => {

@@ -179,11 +179,7 @@
 
               <TaskDetailMenu>
                 <template #title> Priority </template>
-                <v-menu
-                  v-model="menuPriority"
-                  :close-on-content-click="false"
-                  location="bottom"
-                >
+                <PriorityPicker v-model="form.taskPriority.val">
                   <template #activator="{ props }">
                     <v-btn
                       :prepend-icon="mdiFlag"
@@ -200,23 +196,7 @@
                       }}
                     </v-btn>
                   </template>
-
-                  <v-list>
-                    <v-list-item
-                      v-for="(item, i) in priorityOptions"
-                      :key="`prio-${i}`"
-                      :base-color="item.color"
-                      @click="setTaskPriority(item.value)"
-                    >
-                      <template #prepend>
-                        <v-icon :icon="mdiFlag"></v-icon>
-                      </template>
-                      <v-list-item-title>
-                        Priority {{ item.value }}
-                      </v-list-item-title>
-                    </v-list-item>
-                  </v-list>
-                </v-menu>
+                </PriorityPicker>
               </TaskDetailMenu>
             </template>
           </v-col>
@@ -245,12 +225,12 @@ import { useMethodDateFormatter } from '@/composables/methods/useMethodDateForma
 import TaskList from './TaskList.vue'
 import TaskDetailMenu from './TaskDetailMenu.vue'
 import DateTimePicker from './DateTimePicker.vue'
+import PriorityPicker from './PriorityPicker.vue'
 
 const taskStore = useTaskStore()
 const detailStore = useDetailStore()
 const { openTaskDetail } = useStateTaskDetailModal()
-const { menuPriority, priorityOptions, getPriorityColor } =
-  useStateTaskPriority()
+const { getPriorityColor } = useStateTaskPriority()
 const { form, isFormValid, inputTaskNameRef, setFormData } =
   useStateFormInputs()
 const { formatDate, formatTime } = useMethodDateFormatter()
@@ -351,9 +331,7 @@ watch(form.value.taskTime, (newTime) => {
   taskStore.updateTaskTime(detailStore.activeKey, newTime.val)
 })
 
-const setTaskPriority = (priority) => {
-  form.value.taskPriority.val = priority
-  taskStore.updateTaskPriority(detailStore.activeKey, priority)
-  menuPriority.value = false
-}
+watch(form.value.taskPriority, (newPriority) => {
+  taskStore.updateTaskPriority(detailStore.activeKey, newPriority.val)
+})
 </script>

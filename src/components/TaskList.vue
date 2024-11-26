@@ -43,7 +43,8 @@
                 size="small"
                 density="comfortable"
               >
-                {{ dateAdapter.format(task.date, 'shortDate') }}
+                {{ formatDate(task.date) }},
+                {{ formatTime(task.time) }}
               </v-chip>
             </div>
           </v-card>
@@ -89,6 +90,7 @@ import { useStateDates } from '@/composables/states/useStateDates'
 import { useStateTaskPriority } from '@/composables/states/useStateTaskPriority'
 import { useStateTaskForm } from '@/composables/states/useStateTaskForm'
 import { useStateTaskDetailModal } from '@/composables/states/useStateTaskDetailModal'
+import { useMethodDateFormatter } from '@/composables/methods/useMethodDateFormatter'
 import TaskForm from './TaskForm.vue'
 
 const dateAdapter = useDate()
@@ -96,6 +98,7 @@ const { todayMidnight } = useStateDates()
 const { getPriorityColor } = useStateTaskPriority()
 const { showTaskForm, openTaskForm } = useStateTaskForm()
 const { openTaskDetail } = useStateTaskDetailModal()
+const { formatDate, formatTime } = useMethodDateFormatter()
 
 const taskStore = useTaskStore()
 const { setTaskStatus, deleteTask } = taskStore

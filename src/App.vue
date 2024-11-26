@@ -2,7 +2,7 @@
   <v-app>
     <v-layout class="rounded rounded-md">
       <v-navigation-drawer v-model="showDrawer">
-        <SideMenu />
+        <SideNav />
       </v-navigation-drawer>
 
       <v-app-bar>
@@ -27,7 +27,7 @@
 import { ref, watchEffect } from 'vue'
 import { RouterView, useRoute } from 'vue-router'
 import { useDisplay } from 'vuetify'
-import SideMenu from '@/components/SideMenu.vue'
+import SideNav from '@/components/SideNav.vue'
 import TaskDetail from './components/TaskDetail.vue'
 
 const route = useRoute()
