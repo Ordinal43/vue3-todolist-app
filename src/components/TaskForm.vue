@@ -47,13 +47,41 @@
                   {{ formatDate(form.taskDate.val) }}
                 </v-btn>
               </template>
+              <v-card>
+                <v-date-picker
+                  :model-value="form.taskDate.val"
+                  @update:model-value="setTaskDate"
+                  :min="minDate"
+                  hide-header
+                ></v-date-picker>
 
-              <v-date-picker
-                :model-value="form.taskDate.val"
-                @update:model-value="setTaskDate"
-                :min="minDate"
-                hide-header
-              ></v-date-picker>
+                <v-divider></v-divider>
+                <div class="pa-3">
+                  <v-btn-group divided variant="outlined" density="compact">
+                    <v-btn :prepend-icon="mdiClock">
+                      {{ time ?? 'Time' }}
+                      <v-menu
+                        activator="parent"
+                        v-model="menuTimePicker"
+                        :close-on-content-click="false"
+                      >
+                        <v-time-picker
+                          :model-value="time"
+                          @update:model-value="setTaskDate"
+                          format="24hr"
+                          color="primary"
+                          hide-header
+                        ></v-time-picker>
+                      </v-menu>
+                    </v-btn>
+                    <v-btn
+                      v-if="time"
+                      @click="resetTimePicker"
+                      :icon="mdiClose"
+                    ></v-btn>
+                  </v-btn-group>
+                </div>
+              </v-card>
             </v-menu>
 
             <v-menu
@@ -121,16 +149,20 @@
 <script setup>
 import { computed, inject, nextTick, ref, watchEffect } from 'vue'
 import { VDialog } from 'vuetify/components/VDialog'
-import { mdiCalendar, mdiClose, mdiFlag } from '@mdi/js'
+import { VTimePicker } from 'vuetify/labs/VTimePicker'
+import { mdiCalendar, mdiClock, mdiClose, mdiFlag } from '@mdi/js'
 import { useTaskStore } from '@/stores/useTaskStore'
 import { useDetailStore } from '@/stores/useDetailStore'
 import { useDatePicker } from '@/composables/useDatePicker'
 import { useTaskPriority } from '@/composables/useTaskPriority'
 import { useFormInputs } from '@/composables/useFormInputs'
+import { useTimePicker } from '@/composables/useTimePicker'
 
 const taskStore = useTaskStore()
 const detailStore = useDetailStore()
 const { minDate, menuDatePicker, formatDate, setDateAndClose } = useDatePicker()
+const { menuTimePicker, time, resetTimePicker, closeTimePicker } =
+  useTimePicker()
 const { menuPriority, priorityOptions, getPriorityColor, setPriorityAndClose } =
   useTaskPriority()
 const { form, isFormValid, formRef, inputTaskNameRef, resetForm } =
@@ -182,7 +214,15 @@ const getVariant = computed(() => {
 // menu date-picker logic
 const setTaskDate = (event) => {
   setDateAndClose(() => {
-    form.value.taskDate.val = event
+    closeTimePicker()
+    const formDate = form.value.taskDate
+    if (event instanceof Date) {
+      formDate.val = event
+    } else {
+      if (event !== null) {
+        formDate.val.setHours(...event.split(':'))
+      }
+    }
   })
 }
 
@@ -210,7 +250,6 @@ const submitForm = () => {
     const { taskName, taskDesc, taskDate, taskPriority } = form.value
     const parentKey = isSubtaskForm ? detailStore.activeKey : null
     const parentLevel = taskStore.tasks.get(parentKey)?.level ?? 0
-
     taskStore.addNewTask(parentKey, parentLevel, {
       name: taskName.val,
       desc: taskDesc.val,

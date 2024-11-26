@@ -31,9 +31,10 @@ export const useFormInputs = () => {
   const inputTaskNameRef = useTemplateRef('input-task-name')
 
   const setFormData = ({ name, desc, dateStr, priority }) => {
+    const dateObj = new Date(dateStr)
     form.value.taskName.val = name
     form.value.taskDesc.val = desc
-    form.value.taskDate.val = new Date(dateStr)
+    form.value.taskDate.val = dateObj
     form.value.taskPriority.val = priority
   }
 

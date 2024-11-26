@@ -175,12 +175,41 @@
                     </v-btn>
                   </template>
 
-                  <v-date-picker
-                    :model-value="form.taskDate.val"
-                    @update:model-value="setTaskDate"
-                    :min="minDate"
-                    hide-header
-                  ></v-date-picker>
+                  <v-card>
+                    <v-date-picker
+                      :model-value="form.taskDate.val"
+                      @update:model-value="setTaskDate"
+                      :min="minDate"
+                      hide-header
+                    ></v-date-picker>
+
+                    <v-divider></v-divider>
+                    <div class="pa-3">
+                      <v-btn-group divided variant="outlined" density="compact">
+                        <v-btn :prepend-icon="mdiClock">
+                          {{ time ?? 'Time' }}
+                          <v-menu
+                            activator="parent"
+                            v-model="menuTimePicker"
+                            :close-on-content-click="false"
+                          >
+                            <v-time-picker
+                              :model-value="time"
+                              @update:model-value="setTaskDate"
+                              format="24hr"
+                              color="primary"
+                              hide-header
+                            ></v-time-picker>
+                          </v-menu>
+                        </v-btn>
+                        <v-btn
+                          v-if="time"
+                          @click="resetTimePicker"
+                          :icon="mdiClose"
+                        ></v-btn>
+                      </v-btn-group>
+                    </div>
+                  </v-card>
                 </v-menu>
               </TaskDetailMenu>
 
@@ -235,10 +264,12 @@
 
 <script setup>
 import { computed, nextTick, provide, ref, watchEffect } from 'vue'
+import { VTimePicker } from 'vuetify/labs/VTimePicker'
 import {
   mdiCalendar,
   mdiCheck,
   mdiChevronRight,
+  mdiClock,
   mdiClose,
   mdiFileTree,
   mdiFlag,
@@ -246,6 +277,7 @@ import {
 import { useTaskStore } from '@/stores/useTaskStore'
 import { useDetailStore } from '@/stores/useDetailStore'
 import { useDatePicker } from '@/composables/useDatePicker'
+import { useTimePicker } from '@/composables/useTimePicker'
 import { useTaskPriority } from '@/composables/useTaskPriority'
 import { useTaskDetailModal } from '@/composables/useTaskDetailModal'
 import { useFormInputs } from '@/composables/useFormInputs'
@@ -255,6 +287,8 @@ import TaskDetailMenu from './TaskDetailMenu.vue'
 const taskStore = useTaskStore()
 const detailStore = useDetailStore()
 const { minDate, menuDatePicker, formatDate, setDateAndClose } = useDatePicker()
+const { menuTimePicker, time, resetTimePicker, closeTimePicker } =
+  useTimePicker()
 const { menuPriority, priorityOptions, getPriorityColor, setPriorityAndClose } =
   useTaskPriority()
 const { openTaskDetail } = useTaskDetailModal()
@@ -349,7 +383,16 @@ const submitForm = () => {
 // menu date-picker logic
 const setTaskDate = (event) => {
   setDateAndClose(() => {
-    taskStore.updateTaskDate(detailStore.activeKey, event)
+    closeTimePicker()
+    const formDate = form.value.taskDate
+    if (event instanceof Date) {
+      formDate.val = event
+    } else {
+      if (event !== null) {
+        formDate.val.setHours(...event.split(':'))
+      }
+    }
+    taskStore.updateTaskDate(detailStore.activeKey, formDate.val)
   })
 }
 

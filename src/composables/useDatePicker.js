@@ -10,7 +10,16 @@ export const useDatePicker = () => {
   const menuDatePicker = ref(false)
 
   const formatDate = (dateValue) => {
-    return dateAdapter.format(dateValue, 'normalDateWithWeekday')
+    const shortDate = dateAdapter.format(dateValue, 'shortDate')
+
+    dateValue = new Date(dateValue)
+
+    if (dateValue.getHours() === 0 && dateValue.getMinutes() === 0) {
+      return shortDate
+    } else {
+      const time = dateAdapter.format(dateValue, 'fullTime12h')
+      return `${shortDate} ${time}`
+    }
   }
 
   const setDateAndClose = (callback) => {
