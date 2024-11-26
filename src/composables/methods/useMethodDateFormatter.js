@@ -1,6 +1,6 @@
 import { useDate } from 'vuetify'
 
-export const useDateTimeFormatter = () => {
+export const useMethodDateFormatter = () => {
   const dateAdapter = useDate()
   const formatDate = (dateValue) => {
     const shortDate = dateAdapter.format(dateValue, 'shortDate')

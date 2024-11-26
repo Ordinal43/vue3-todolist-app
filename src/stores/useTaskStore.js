@@ -3,14 +3,14 @@ import { useLocalStorage } from '@vueuse/core'
 import { defineStore } from 'pinia'
 import { v4 as uuidv4 } from 'uuid'
 import { useDate } from 'vuetify'
-import { useCustomDate } from '@/composables/useCustomDate'
+import { useStateDates } from '@/composables/states/useStateDates'
 
 const LOCAL_STORAGE_KEY = 'todo-list-tasks'
 
 export const useTaskStore = defineStore('task', () => {
   // task CRUD logic
   const tasks = useLocalStorage(LOCAL_STORAGE_KEY, new Map())
-  const { todayMidnight } = useCustomDate()
+  const { todayMidnight } = useStateDates()
 
   const clearStorage = () => {
     tasks.value = new Map()

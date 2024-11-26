@@ -1,6 +1,6 @@
 import { ref } from 'vue'
 
-export const useTaskPriority = () => {
+export const useStateTaskPriority = () => {
   const menuPriority = ref(false)
   const priorityOptions = [
     { value: 1, color: 'red' },

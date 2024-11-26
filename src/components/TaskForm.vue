@@ -116,17 +116,18 @@ import { VDialog } from 'vuetify/components/VDialog'
 import { mdiCalendar, mdiClose, mdiFlag } from '@mdi/js'
 import { useTaskStore } from '@/stores/useTaskStore'
 import { useDetailStore } from '@/stores/useDetailStore'
-import { useDateTimeFormatter } from '@/composables/useDateTimeFormatter'
-import { useTaskPriority } from '@/composables/useTaskPriority'
-import { useFormInputs } from '@/composables/useFormInputs'
+import { useStateTaskPriority } from '@/composables/states/useStateTaskPriority'
+import { useStateFormInputs } from '@/composables/states/useStateFormInputs'
+import { useMethodDateFormatter } from '@/composables/methods/useMethodDateFormatter'
 import DateTimePicker from './DateTimePicker.vue'
 
 const taskStore = useTaskStore()
 const detailStore = useDetailStore()
-const { formatDate } = useDateTimeFormatter()
-const { menuPriority, priorityOptions, getPriorityColor } = useTaskPriority()
+const { menuPriority, priorityOptions, getPriorityColor } =
+  useStateTaskPriority()
 const { form, isFormValid, formRef, inputTaskNameRef, resetForm } =
-  useFormInputs()
+  useStateFormInputs()
+const { formatDate } = useMethodDateFormatter()
 
 // dialog logic
 const showForm = defineModel()

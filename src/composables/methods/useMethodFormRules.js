@@ -1,4 +1,4 @@
-export const useFormRules = () => {
+export const useMethodFormRules = () => {
   const ruleRequired = (value) => {
     if (value) return true
     return `Field is required.`

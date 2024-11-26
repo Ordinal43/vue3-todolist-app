@@ -1,10 +1,10 @@
 import { ref, useTemplateRef } from 'vue'
-import { useCustomDate } from './useCustomDate'
-import { useFormRules } from './useFormRules'
+import { useStateDates } from './useStateDates'
+import { useMethodFormRules } from '../methods/useMethodFormRules'
 
-export const useFormInputs = () => {
-  const { todayMidnight } = useCustomDate()
-  const { ruleRequired, ruleMaxLen } = useFormRules()
+export const useStateFormInputs = () => {
+  const { todayMidnight } = useStateDates()
+  const { ruleRequired, ruleMaxLen } = useMethodFormRules()
 
   const getInitialData = () => ({
     taskName: {

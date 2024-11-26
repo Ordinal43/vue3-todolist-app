@@ -1,6 +1,6 @@
 import { ref } from 'vue'
 
-export const useTimePicker = () => {
+export const useStateTimePicker = () => {
   const menuTimePicker = ref(false)
   const time = ref(null)
 

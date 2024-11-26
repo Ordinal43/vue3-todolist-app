@@ -1,8 +1,8 @@
 import { ref } from 'vue'
-import { useCustomDate } from './useCustomDate'
+import { useStateDates } from './useStateDates'
 
-export const useDatePicker = () => {
-  const { todayMidnight } = useCustomDate()
+export const useStateDatePicker = () => {
+  const { todayMidnight } = useStateDates()
 
   const minDate = ref(todayMidnight)
   const menuDatePicker = ref(false)

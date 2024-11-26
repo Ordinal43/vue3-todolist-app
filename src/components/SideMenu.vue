@@ -61,8 +61,8 @@ import { useRouter } from 'vue-router'
 import { storeToRefs } from 'pinia'
 import { mdiPlusCircle, mdiTrashCan } from '@mdi/js'
 import { useTaskStore } from '@/stores/useTaskStore'
-import { useTaskForm } from '@/composables/useTaskForm'
-import { useClearStorage } from '@/composables/useClearStorage'
+import { useStateTaskForm } from '@/composables/states/useStateTaskForm'
+import { useStateStorageDialog } from '@/composables/states/useStateStorageDialog'
 import TaskForm from './TaskForm.vue'
 import {
   ROUTE_NAME_TODAY,
@@ -73,9 +73,9 @@ import {
 const taskStore = useTaskStore()
 const { getTasksOverdue, getTasksToday, getTasksUpcoming } =
   storeToRefs(taskStore)
-const { showTaskForm, openTaskForm } = useTaskForm()
+const { showTaskForm, openTaskForm } = useStateTaskForm()
 const { dialog, warningMessage, openDialog, closeDialog, clearStorage } =
-  useClearStorage()
+  useStateStorageDialog()
 
 // route logic
 const routes = computed(() => {
